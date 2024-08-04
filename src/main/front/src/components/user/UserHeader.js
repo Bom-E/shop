@@ -1,0 +1,135 @@
+import React, { useRef, useState } from 'react';
+import springLogo from '../../assets/with_Spring_removebg.png';
+import useClickOutside from '../../hooks/common/useClickOutside';
+
+const UserHeader = () => {
+
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [selectedOption, setSelectedOption] = useState("통합검색");
+    const dropdownRef = useRef(null);
+
+    useClickOutside(dropdownRef, () => {
+        if(isDropdownOpen) setIsDropdownOpen(false);
+    });
+
+    const toggleDropdown = (e) => {
+        e.preventDefault();
+        setIsDropdownOpen(!isDropdownOpen);
+    };
+
+    const handleOptionClick = (optionName) => {
+        setSelectedOption(optionName);
+        setIsDropdownOpen(false);
+    };
+
+
+
+    return(
+        <header className="w-full bg-sky-400 py-8 md:py-10">
+
+            <div className="container mx-auto px-4">
+
+
+                <div className="flex justify-between items-center">
+                    <span className="flex-shrink-0">
+                        <img src={springLogo} alt="Spring 로고" className="h-16 w-16 md:h-24 md:w-24 lg:h-44 lg:w-44 object-contain"/>
+                    </span>
+                    <span className="flex-grow flex justify-start ml-4 md:ml-8 lg:ml-16">
+                        <form className="w-full max-w-xl">
+                            <div className="flex relative" ref={dropdownRef}>
+                                <button id="dropdown-button" onClick={toggleDropdown} className="flex-shrink-0 z-10 w-32 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-l-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600" type="button">{selectedOption}
+                                    <svg className="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
+                                    </svg>
+                                </button>
+                                {isDropdownOpen && (
+                                    <div id="dropdown" className="absolute top-full left-0 z-50 mt-1 bg-white divide-y divide-gray-100 rounded-lg shadow w-32">
+                                        <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown-button">
+                                            <li>
+                                                <button type="button" name="all" onClick={() => handleOptionClick('통합검색')} className="inline-flex w-full px-4 py-2 hover:bg-gray-100">통합검색</button>
+                                            </li>
+                                            <li>
+                                                <button type="button" name="goods" onClick={() => handleOptionClick('굿즈')} className="inline-flex w-full px-4 py-2 hover:bg-gray-100">굿즈</button>
+                                            </li>
+                                            <li>
+                                                <button type="button" name="author" onClick={() => handleOptionClick('저자')} className="inline-flex w-full px-4 py-2 hover:bg-gray-100">저자</button>
+                                            </li>
+                                            <li>
+                                                <button type="button" name="publisher" onClick={() => handleOptionClick('출판사')} className="inline-flex w-full px-4 py-2 hover:bg-gray-100">출판사</button>
+                                            </li>
+                                        </ul>
+                                </div>
+                                )}
+                                <div className="relative flex-grow">
+                                    <input type="search" id="search-dropdown" name="searchValue" className="block p-2.5 pr-12 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-r-lg border-l-gray-50 border-l-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Search Mockups, Logos, Design Templates..." required />
+                                    <input type="hidden" name="searchType" value={
+                                        selectedOption === '통합검색' ? 'all' :
+                                        selectedOption === '굿즈' ? 'goods' :
+                                        selectedOption === '저자' ? 'author' :
+                                        selectedOption === '출판사' ? 'publisher' : ''
+
+                                    }/>
+                                    {/* <button type="submit" className="absolute top-0 right-0 p-2.5 px-3 text-sm font-medium h-full text-gray-600 bg-transparent rounded-r-lg border-0 focus:ring-4 focus:outline-none"> */}
+                                    <button type="submit" className="absolute right-2.5 inset-y-0 flex items-center text-gray-600  focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-4">
+                                        <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                                        </svg>
+                                        <span className="sr-only">Search</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </span>
+                    <span>
+                        {/* <button>와 디자인 감이 1도 안 잡힌다.</button> */}
+                    </span>
+
+                    
+                </div>
+
+                <div className="">
+                    <span className="">
+                        
+
+                        <nav class="border-gray-200 dark:bg-gray-900">
+                            <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+                                <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+                                    <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0  dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                                        <li>
+                                            <a href="#" class="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500" aria-current="page">Home</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">About</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Services</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Pricing</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Contact</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </nav>
+
+                    </span>
+                    <span className="">
+
+                    </span>
+                </div>
+
+            </div>
+
+
+        </header>
+
+    )
+
+
+}
+
+export default UserHeader;
+
