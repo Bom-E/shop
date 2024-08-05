@@ -2,8 +2,9 @@ import React, { useRef, useState } from 'react';
 import springLogo from '../../assets/with_Spring_removebg.png';
 import useClickOutside from '../../hooks/common/useClickOutside';
 
-const UserHeader = () => {
+const UserHeader = ({navHome}) => {
 
+    // 드롭 다운 훅
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState("통합검색");
     const dropdownRef = useRef(null);
@@ -23,18 +24,14 @@ const UserHeader = () => {
     };
 
 
-
     return(
-        <header className="w-full bg-sky-400 py-8 md:py-10">
-
+        <header className="w-full py-8 md:py-10 h-48">
             <div className="container mx-auto px-4">
-
-
                 <div className="flex justify-between items-center">
-                    <span className="flex-shrink-0">
-                        <img src={springLogo} alt="Spring 로고" className="h-16 w-16 md:h-24 md:w-24 lg:h-44 lg:w-44 object-contain"/>
+                    <span className="flex-shrink-0 cursor-pointer" onClick={navHome}>
+                        <img src={springLogo} alt="Spring 로고" className="h-16 w-16 md:h-24 md:w-24 lg:h-44 lg:w-44 object-contain" />
                     </span>
-                    <span className="flex-grow flex justify-start ml-4 md:ml-8 lg:ml-16">
+                    <span className="flex-grow flex justify-center">
                         <form className="w-full max-w-xl">
                             <div className="flex relative" ref={dropdownRef}>
                                 <button id="dropdown-button" onClick={toggleDropdown} className="flex-shrink-0 z-10 w-32 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-l-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600" type="button">{selectedOption}
@@ -80,50 +77,8 @@ const UserHeader = () => {
                             </div>
                         </form>
                     </span>
-                    <span>
-                        {/* <button>와 디자인 감이 1도 안 잡힌다.</button> */}
-                    </span>
-
-                    
                 </div>
-
-                <div className="">
-                    <span className="">
-                        
-
-                        <nav class="border-gray-200 dark:bg-gray-900">
-                            <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-                                <div class="hidden w-full md:block md:w-auto" id="navbar-default">
-                                    <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0  dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                                        <li>
-                                            <a href="#" class="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500" aria-current="page">Home</a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">About</a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Services</a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Pricing</a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Contact</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </nav>
-
-                    </span>
-                    <span className="">
-
-                    </span>
-                </div>
-
             </div>
-
-
         </header>
 
     )
