@@ -18,16 +18,16 @@ const navItems = [
 
 function Header() {
   const navigate= useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
   
-  const isActive = (path) => location.pathname === path;
+  // const isActive = (path) => location.pathname === path;
   const navigateTo = (path) => navigate(path);
 
 
   return(
-    <header className="bg-yellow-100">
+    <header className="bg-transparent">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row items-center justify-between py-4">
+        <div className="flex flex-col md:flex-row items-center justify-between">
           <UserHeader navHome={() => navigateTo('/')}/>
           
         </div>
@@ -49,13 +49,19 @@ function AppContent() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header/>
-      <Navigation navItems={navItems} isActive={isActive} navigateTo={navigateTo} className="bg-white shadow"/>
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <Routes>
+      <div className="xl:mt-8">
+        <Navigation navItems={navItems} isActive={isActive} navigateTo={navigateTo} className="bg-white shadow"/>
+      </div>
+      
+      <main className="flex-grow container mx-auto px-4 py-8 overflow-auto">
+        <div>
+          <Routes>
         {navItems.map(({path, component : Component}) => (
           <Route key={path} path={path} element={<Component/>}/>
         ))}
         </Routes>
+        </div>
+        
       </main>
       <footer className="bg-gray-200 py-4">
           <div className="container mx-auto px-4">

@@ -1,5 +1,7 @@
 import React, { useRef, useState } from 'react';
 import springLogo from '../../assets/with_Spring_removebg.png';
+import topBanner from '../../assets/topBanner.png';
+import headerAD from '../../assets/headerAD.png';
 import useClickOutside from '../../hooks/common/useClickOutside';
 
 const UserHeader = ({navHome}) => {
@@ -25,13 +27,16 @@ const UserHeader = ({navHome}) => {
 
 
     return(
-        <header className="w-full py-8 md:py-10 h-48">
-            <div className="container mx-auto px-4">
+        <header className="w-full h-48">
+            <div className="h-10 w-full flex items-center justify-center bg-gray-100">
+                <img src={topBanner} alt="최상단 배너"/>
+            </div>
+            <div className="container mx-auto px-4 py-8 md:py-10 lg:py-4">
                 <div className="flex justify-between items-center">
                     <span className="flex-shrink-0 cursor-pointer" onClick={navHome}>
                         <img src={springLogo} alt="Spring 로고" className="h-16 w-16 md:h-24 md:w-24 lg:h-44 lg:w-44 object-contain" />
                     </span>
-                    <span className="flex-grow flex justify-center">
+                    <span className="flex-grow flex justify-start">
                         <form className="w-full max-w-xl">
                             <div className="flex relative" ref={dropdownRef}>
                                 <button id="dropdown-button" onClick={toggleDropdown} className="flex-shrink-0 z-10 w-32 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-l-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600" type="button">{selectedOption}
@@ -76,6 +81,14 @@ const UserHeader = ({navHome}) => {
                                 </div>
                             </div>
                         </form>
+                    </span>
+                    <span className="bg-transparent flex-shrink-0 lg:w-1/5">
+                        <div className="bg-gray-200 h-28 w-full items-center justify-center hidden md:flex">
+                            <img src={headerAD} alt="헤더 광고"/>
+                        </div>
+                        <div className="bg-gray-200 w-full py-2 text-center hidden">
+                            모바일용 광고(우측에 작게 띄우기)
+                        </div>
                     </span>
                 </div>
             </div>
