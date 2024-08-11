@@ -4,7 +4,40 @@
 <!-- 해당 파일에 모든 쿼리문을 작성 -->
 <mapper namespace="userMapper">
 
-    
+    <resultMap id="userAccount" type="com.bom.shop.user.vo.UserAccountVO">
+        <id     column="USER_ID"    property="userId"/>
+        <result column="USER_PW"    property="userPw"/>
+        <result column="USER_ROLE"  property="userRole"/>
+        <result column="CREATED_AT" property="createdAt"/>
+        <result column="UPDATED_AT" property="updatedAt"/>
+        <association property="userProfileVO" resultMap="userProfile"/>
+        <collection property="userAddrVO" resultMap="userAddr"/>
+    </resultMap>
+
+    <resultMap id="userProfile" type="com.bom.shop.user.vo.UserProfileVO">
+        <id     column="USER_ID"    property="userId"/>
+        <result column="USER_NAME"  property="userName"/>
+        <result column="GENDER"     property="gender"/>
+        <result column="USER_EMAIL" property="userEmail"/>
+        <result column="USER_TEL"   property="userTel"/>
+        <result column="BIRTH_DATE" property="birthDate"/>
+        <result column="JOIN_DATE"  property="joinDate"/>
+        <result column="CREATED_AT" property="createdAt"/>
+        <result column="UPDATED_AT" property="updatedAt"/>
+        <association property="userAccountVO" resultMap="userAccount"/>
+    </resultMap>
+
+    <resultMap id="userAddr" type="com.bom.shop.user.vo.UserAddrVO">
+        <id     column="ADDR_CODE"      property="addrCode"/>
+        <result column="ADDR"           property="addr"/>
+        <result column="ADDR_DETAIL"    property="addrDetail"/>
+        <result column="POST_CODE"      property="postCode"/>
+        <result column="IS_DEFAULT"     property="isDefault"/>
+        <result column="USER_ID"        property="userId"/>
+        <result column="CREATED_AT"     property="createdAt"/>
+        <result column="UPDATED_AT"     property="updatedAt"/>
+        <association property="userAccountVO" resultMap="userAccount"/>
+    </resultMap>
 
 </mapper>
 
