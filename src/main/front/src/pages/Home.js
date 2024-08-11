@@ -35,7 +35,7 @@ const Home = () => {
                             </div>
                         </div>
                         <div>
-                            <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+                            <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
                         </div>
                         <div className="flex">
                             <img src={toYou} alt="책2" className="w-28 h-28.1"/>
@@ -45,26 +45,26 @@ const Home = () => {
                             </div>
                         </div>
                         <div>
-                            <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+                            <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
                         </div>
                     </div>
                     <div className="col-span-1 row-span-4">
                         <div className="flex flex-col space-y-2">
                             <div className="mb-2">3. 저축노하우 식사법</div>
                             <div>
-                                <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+                                <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
                             </div>
                             <div className="mb-2">4. 미래를 먼저 경험했습니다</div>
                             <div>
-                                <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+                                <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
                             </div>
                             <div className="mb-2">5. 일인칭 가난</div>
                             <div>
-                                <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+                                <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
                             </div>
                             <div>6. 죽이고 싶은 아이 2</div>
                             <div>
-                                <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+                                <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
                             </div>
                         </div>
                     </div>
@@ -72,19 +72,19 @@ const Home = () => {
                         <div className="flex flex-col space-y-2">
                             <div className="mb-2">7. 더 좋은 문장을 쓰고 싶은...</div>
                             <div>
-                                <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+                                <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
                             </div>
                             <div className="mb-2">8. 불변의 법칙</div>
                             <div>
-                                <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+                                <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
                             </div>
                             <div className="mb-2">9. 지도로 보아야 보인다</div>
                             <div>
-                                <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+                                <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
                             </div>
                             <div>10. ETS 토익 정기시험 기출문...</div>
                             <div>
-                                <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+                                <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"></hr>
                             </div>
                         </div>
                     </div>                   
