@@ -13,7 +13,7 @@ function Header() {
     <header className="bg-transparent">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center justify-between">
-          <UserHeader navHome={() => navigateTo('/')} userSign={() => navigateTo('/userSign')}/>
+          <UserHeader navHome={() => navigateTo('/')} userSign={() => navigateTo('/userSign/sign1')}/>
           
         </div>
       </div>
@@ -46,7 +46,7 @@ function AppContent() {
               route.children ? (
                 <Route key={route.path} path={route.path} element={<route.component/>}>
                   {route.children.map(childRoute => (
-                    <Route key={childRoute.path} path={childRoute.path} element={< childRoute.component/>}/>
+                    <Route key={childRoute.path || 'index'} index={childRoute.index} path={childRoute.path} element={childRoute.element || <childRoute.component/>}/>
                   ))}
                 </Route>
               ) : (

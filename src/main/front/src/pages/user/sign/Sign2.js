@@ -1,7 +1,7 @@
 const Sign2 = () => {
     return(
         <div>
-            14세 미만
+            해외 회원
         </div>
     )
 };

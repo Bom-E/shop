@@ -11,17 +11,17 @@ const UserSign = ({ className = '' }) => {
 
     return(
         <div>
-            <nav className={`border-gray-200 dark:bg-gray-900 mt-auto ${className}`}>
-                <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-                    <ul className="font-medium flex flex-row justify-start space-x-8 mt-0 border-0">
+            <nav className={`border-gray-200 dark:bg-gray-900 flex items-center justify-center h-16 ${className}`}>
+                <div className="max-w-screen-xl flex flex-wrap items-center justify-center mx-auto p-4">
+                    <ul className="font-medium flex w-full justify-between items-center space-x-0 mt-0 border-0">
                         {signItems.map(({path, label}) => (
-                            <li key={path}>
+                            <li key={path} className="flex-1 h-full">
                                 <button
                                     onClick={() => signNavi(path)}
-                                    className={`block py-2 px-3 ${
+                                    className={`w-full h-20 flex items-center justify-center mr-40 ${
                                         checkActive(path)
-                                            ? 'text-white rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-wrap md:dark:text-blue-500'
-                                            : 'text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover::text-white md:dark:hover:bg-transparent'
+                                            ? 'text-white bg-blue-700'
+                                            : 'bg-white text-gray-900 hover:bg-gray-100'
                                         } appearance-auto`} aria-current={checkActive(path) ? 'page' : undefined}>
                                     {label}
                                 </button>
@@ -30,6 +30,7 @@ const UserSign = ({ className = '' }) => {
                     </ul>
                 </div>
             </nav>
+            <hr className="mt-2"></hr>
             <Outlet/>
         </div>
     );

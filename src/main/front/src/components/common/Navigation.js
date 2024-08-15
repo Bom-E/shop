@@ -24,7 +24,7 @@ const Navigation = ({navItems, isActive, navigateTo, className = ''}) => {
                     <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
                         로그인
                     </button>
-                    <button onClick={() => navigateTo('/userSign')} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                    <button onClick={() => navigateTo('/userSign/sign1')} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
                         회원가입
                     </button>
                     <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
