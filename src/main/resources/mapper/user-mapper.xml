@@ -39,7 +39,35 @@
         <association property="userAccountVO" resultMap="userAccount"/>
     </resultMap>
 
+    <!-- for로 한번에 데이터를 다 삽입 할 건지, 아니면 각자 삽입 쿼리를 만들건지 -->
+    <!-- for문으로 한번에 : 한번에 처리해서 빠름. 하지만 트랜지션을 걸 수가 없어서 버그 나면 내 수준에서 힘들 거 같음. -->
+    <!-- 삽입 쿼리 3개 : 조금 귀찮고 위보다는 느림. 하지만 트랜지션을 걸 수 있어서 안정성이 높음 -->
+    <!-- 결론 : 삽입 쿼리를 3개 만들자! -->
+
     <!-- 회원가입 insert -->
+    <insert id="userSignInsert1">
+        INSERT INTO USER_PROFILE(
+
+        ) VALUES (
+
+        )
+    </insert>
+
+    <insert id="userSignInsert2">
+        INSERT INTO USER_ACCOUNT(
+
+        ) VALUES (
+
+        )
+    </insert>
+
+    <insert id="userSignInsert3">
+        INSERT INTO USER_ADDR(
+
+        ) VALUES (
+
+        )
+    </insert>
 
     <!-- 중복가입 방지 -->
 
