@@ -45,29 +45,29 @@
     <!-- 결론 : 삽입 쿼리를 3개 만들자! -->
 
     <!-- 회원가입 insert -->
-    <insert id="userSignInsert1">
-        INSERT INTO USER_PROFILE(
+<!--    <insert id="userSignInsert1">-->
+<!--        INSERT INTO USER_PROFILE(-->
 
-        ) VALUES (
+<!--        ) VALUES (-->
 
-        )
-    </insert>
+<!--        )-->
+<!--    </insert>-->
 
-    <insert id="userSignInsert2">
-        INSERT INTO USER_ACCOUNT(
+<!--    <insert id="userSignInsert2">-->
+<!--        INSERT INTO USER_ACCOUNT(-->
 
-        ) VALUES (
+<!--        ) VALUES (-->
 
-        )
-    </insert>
+<!--        )-->
+<!--    </insert>-->
 
-    <insert id="userSignInsert3">
-        INSERT INTO USER_ADDR(
+<!--    <insert id="userSignInsert3">-->
+<!--        INSERT INTO USER_ADDR(-->
 
-        ) VALUES (
+<!--        ) VALUES (-->
 
-        )
-    </insert>
+<!--        )-->
+<!--    </insert>-->
 
     <!-- 중복가입 방지 -->
 

@@ -45,8 +45,8 @@ public class SecurityConfig {
                 )
                 .formLogin(
                         formLogin -> {
-                            formLogin.loginPage("/member/loginForm")
-                                    .loginProcessingUrl("/member/login")
+                            formLogin.loginPage("/user/loginForm")
+                                    .loginProcessingUrl("/user/login")
                                     //.defaultSuccessUrl("/")
                                     //.failureUrl("/member/loginForm")
                                     .usernameParameter("memberId")
@@ -74,9 +74,7 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer(){
         return web -> web.ignoring().requestMatchers(
                 new AntPathRequestMatcher("/assets/**"),
-                new AntPathRequestMatcher("/css/**"),
                 new AntPathRequestMatcher("/js/**"),
-                new AntPathRequestMatcher("/images/**"),
                 new AntPathRequestMatcher("/favicon.ico")
         );
     }

@@ -1,4 +1,4 @@
-package com.bom.shop.home.service;
+package com.bom.shop.user.service;
 
 public interface UserSignService {
 
