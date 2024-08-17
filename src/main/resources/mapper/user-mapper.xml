@@ -45,32 +45,72 @@
     <!-- 결론 : 삽입 쿼리를 3개 만들자! -->
 
     <!-- 회원가입 insert -->
-<!--    <insert id="userSignInsert1">-->
-<!--        INSERT INTO USER_PROFILE(-->
+    <insert id="userSignInsert1">
+        INSERT INTO USER_PROFILE (
+            USER_ID
+            , USER_NAME
+            , GENDER
+            , USER_EMAIL
+            , USER_TEL
+            , BIRTH_DATE
+            , JOIN_DATE
+            , CREATED_AT
+            , UPDATED_AT
+        ) VALUES (
+            #{userId}
+            , #{userName}
+            , #{gender}
+            , #{userEmail}
+            , #{userTel}
+            , #{birthDate}
+            , #{joinDate}
+            , #{createdAt}
+            , #{updatedAt}
+        )
+    </insert>
 
-<!--        ) VALUES (-->
+    <insert id="userSignInsert2">
+        INSERT INTO USER_ACCOUNT (
+            USER_ID
+            , USER_PW
+            , USER_ROLE
+            , CREATED_AT
+            , UPDATED_AT
+        ) VALUES (
+            #{userId}
+            , #{userPw}
+            , #{userRole}
+            , #{createdAt}
+            , #{updatedAt}
+        )
+    </insert>
 
-<!--        )-->
-<!--    </insert>-->
-
-<!--    <insert id="userSignInsert2">-->
-<!--        INSERT INTO USER_ACCOUNT(-->
-
-<!--        ) VALUES (-->
-
-<!--        )-->
-<!--    </insert>-->
-
-<!--    <insert id="userSignInsert3">-->
-<!--        INSERT INTO USER_ADDR(-->
-
-<!--        ) VALUES (-->
-
-<!--        )-->
-<!--    </insert>-->
+    <insert id="userSignInsert3">
+        INSERT INTO USER_ADDR (
+            ADDR
+            , ADDR_DETAIL
+            , POST_CODE
+            , IS_DEFAULT
+            , USER_ID
+            , CREATED_AT
+            , UPDATED_AT
+        ) VALUES (
+            #{addr}
+            , #{addrDetail}
+            , #{postCode}
+            , #{isDefault}
+            , #{userId}
+            , #{createdAt}
+            , #{updatedAt}
+        )
+    </insert>
 
     <!-- 중복가입 방지 -->
-
+    <select id="joinCheck" resultType="boolean">
+        SELECT COUNT(USER_ID)
+        WHERE USER_ID = #{userId}
+        FROM USER_ACCOUNT
+    </select>
 
 </mapper>
 

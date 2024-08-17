@@ -1,6 +1,5 @@
 package com.bom.shop.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,18 +8,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
+
 
 //인증 인가에 대한 설정을 위한 클래스
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
-    @Autowired
-    private LoginFailHandler loginFailHandler;
 
-    @Autowired
-    private LoginSuccessHandler loginSuccessHandler;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity security) throws Exception {
