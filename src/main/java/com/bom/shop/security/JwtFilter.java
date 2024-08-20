@@ -10,10 +10,10 @@ import java.io.IOException;
 
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider jwtTokenProvider;
 
-    public JwtFilter(JwtTokenProvider jwtTokenProvider){
-        this.jwtTokenProvider = jwtTokenProvider;
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
     }
 }
 
