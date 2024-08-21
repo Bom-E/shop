@@ -13,12 +13,12 @@ public class JwtServiceImpl implements JwtService {
     private final JwtTokenParser parser;
     private final JwtTokenResolver resolver;
 
-    public JwtServiceImpl(JwtTokenGenerator generator, JwtTokenValidator validator,
-                          JwtTokenParser parser, JwtTokenResolver resolver){
-        this.generator = generator;
-        this.validator = validator;
-        this.parser = parser;
-        this.resolver = resolver;
+    public JwtServiceImpl(JwtTokenGenerator jwtTokenGenerator, JwtTokenValidator jwtTokenValidator,
+                          JwtTokenParser jwtTokenParser, JwtTokenResolver jwtTokenResolver){
+        this.generator = jwtTokenGenerator;
+        this.validator = jwtTokenValidator;
+        this.parser = jwtTokenParser;
+        this.resolver = jwtTokenResolver;
     }
 
     @Override
@@ -27,18 +27,18 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public boolean validateToken(String token) {
-        return validator.validateToken(token);
+    public boolean validateToken(String token, boolean isRefreshToken) {
+        return validator.isTokenValid(token, isRefreshToken);
     }
 
     @Override
-    public String getUserEmail(String token) {
-        return parser.getUserEmail(token);
+    public String getUserEmail(String token, boolean isRefreshToken) {
+        return parser.getUserEmail(token, isRefreshToken);
     }
 
     @Override
-    public List<String> getRoles(String token) {
-        return parser.getRoles(token);
+    public List<String> getRoles(String token, boolean isRefreshToken) {
+        return parser.getRoles(token, isRefreshToken);
     }
 
     @Override

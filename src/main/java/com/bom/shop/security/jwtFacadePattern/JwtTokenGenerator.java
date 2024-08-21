@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service("jwtTokenGenerator")
@@ -38,7 +39,7 @@ public class JwtTokenGenerator {
                 .compact();
     }
 
-    public String generateRefreshToken(String userEmail){
+    public String generateRefreshToken(String userEmail, List<String> roles){
         return Jwts.builder()
                 .setSubject(userEmail)
                 .setIssuedAt(new Date())

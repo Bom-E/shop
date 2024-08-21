@@ -44,7 +44,7 @@
     <!-- 삽입 쿼리 3개 : 조금 귀찮고 위보다는 느림. 하지만 트랜지션을 걸 수 있어서 안정성이 높음 -->
     <!-- 결론 : 삽입 쿼리를 3개 만들자! -->
 
-    <!-- 회원가입 insert -->
+    <!-- 기본 회원가입 insert -->
     <insert id="userSignInsert1">
         INSERT INTO USER_PROFILE (
             USER_ID
@@ -107,9 +107,41 @@
 
     <!-- 중복가입 방지 -->
     <select id="joinCheck" resultType="boolean">
-        SELECT COUNT(USER_ID)
-        WHERE USER_ID = #{userId}
-        FROM USER_ACCOUNT
+        SELECT COUNT(*)
+        FROM USER_PROFILE
+        WHERE USER_ID = #{userEmail}
+    </select>
+
+    <!-- SSO 회원가입 -->
+    <insert id="signUserWithSso1">
+        INSERT INTO USER_ACCOUNT (
+            USER_ID
+            , USER_ROLE
+            , LOGIN_TYPE
+        ) VALUES(
+            #{userId}
+            , #{userRole}
+            , #{loginType}
+        )
+    </insert>
+
+    <insert id="signUserWithSso2">
+        INSERT INTO USER_PROFILE (
+            USER_ID
+            , USER_NAME
+            , USER_EMAIL
+        ) VALUES(
+            #{userId}
+            , #{userName}
+            , #{userEmail}
+        )
+    </insert>
+
+    <!-- refresh 토큰 용 유저 정보 조회 -->
+    <select id="getRolesByEmail" resultType="String">
+        SELECT USER_ROLE
+        FROM USER_PROFILE
+        WHERE USER_EMAIL = #{userEmail}
     </select>
 
 </mapper>
