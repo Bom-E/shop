@@ -38,4 +38,3 @@ out/
 
 ### 개인 정보 ####
 **/application-oauth.yml
-**/test/resources/application-test-oauth.yml
