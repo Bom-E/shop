@@ -1,81 +1,82 @@
 package com.bom.shop.security;
 
+import com.bom.shop.security.jwtFacadePattern.JwtService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 
-//인증 인가에 대한 설정을 위한 클래스
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
-//    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtService jwtService;
+    private final ObjectMapper objectMapper;
+    private final CustomUserDetailsServiceImpl userDetailsService;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity security) throws Exception {
-
-        security.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(
-                        c -> {
-                            c.anyRequest().permitAll();
-
-//                            c.requestMatchers(
-//                                        new AntPathRequestMatcher("/"),
-//                                        new AntPathRequestMatcher("/item/list"),
-//                                        new AntPathRequestMatcher("/member/loginForm"),
-//                                        new AntPathRequestMatcher("/member/join"),
-//                                        new AntPathRequestMatcher("/member/login")
-//                                    ).permitAll()
-//                                .requestMatchers(
-//                                        new AntPathRequestMatcher("/admin/**")
-//                                ).hasRole("ADMIN")
-//                                .anyRequest().authenticated();
-                        }
-                )
-                .formLogin(
-                        formLogin -> {
-                            formLogin.loginPage("/user/loginForm")
-                                    .loginProcessingUrl("/user/login")
-                                    //.defaultSuccessUrl("/")
-                                    //.failureUrl("/member/loginForm")
-                                    .usernameParameter("memberId")
-                                    .passwordParameter("memberPw")
-                                    //로그인 성공 시 실행시킬 클래스의 객체
-                                    .successHandler(loginSuccessHandler)
-                                    //로그인 실패 시 실행시킬 클래스의 객체
-                                    .failureHandler(loginFailHandler);
-                        }
-                )
-                .logout(
-                        logout -> {
-
-                        }
-                );
-
-
-        return security.build();
+    public SecurityConfig(JwtService jwtService, ObjectMapper objectMapper, CustomUserDetailsServiceImpl userDetailsService){
+        this.jwtService = jwtService;
+        this.objectMapper = objectMapper;
+        this.userDetailsService = userDetailsService;
     }
 
-    //정적인 자원은 security가 인증 및 인가 관리에서 제외하도록 설정
-    //정적인 파일 : .js , .css, 이미지
-    //resources 폴더 밑에 있는 모든 파일들
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable) // 혹시 나중에 시간 여유가 되면 추가 보안 설정 해보기
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/**").permitAll()
+                        // .requestMatchers("/user/**").hasRole("USER")
+                        // .requestMatchers("/admin/**").hasRole("ADMIN")
+                        // .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .successHandler(new MixAuthenticationSuccessHandler(jwtService, objectMapper))
+                        .failureHandler(new MixAuthenticationFailureHandler(objectMapper))
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(new MixAuthenticationSuccessHandler(jwtService, objectMapper))
+                        .failureHandler(new MixAuthenticationFailureHandler(objectMapper))
+                );
+        return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    private CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3030"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer(){
         return web -> web.ignoring().requestMatchers(
-                new AntPathRequestMatcher("/assets/**"),
-                new AntPathRequestMatcher("/js/**"),
-                new AntPathRequestMatcher("/favicon.ico")
+                "/assets/**"
+                , "/js/**"
+                , "/favicon.ico"
         );
     }
-
-
-
 }
-
-

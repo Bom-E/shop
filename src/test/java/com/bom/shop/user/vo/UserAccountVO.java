@@ -7,7 +7,6 @@ public class UserAccountVO {
     private String userId;
     private String userPw;
     private String userRole;
-    private String loginType;
     private String createdAt;
     private String updatedAt;
     private UserProfileVO userProfileVO;

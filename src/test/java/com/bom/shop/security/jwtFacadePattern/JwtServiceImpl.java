@@ -1,6 +1,5 @@
 package com.bom.shop.security.jwtFacadePattern;
 
-import com.bom.shop.security.jwtFacadePattern.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 

@@ -8,7 +8,6 @@
         <id     column="USER_ID"    property="userId"/>
         <result column="USER_PW"    property="userPw"/>
         <result column="USER_ROLE"  property="userRole"/>
-        <result column="LOGIN_TYPE" property="loginType"/>
         <result column="CREATED_AT" property="createdAt"/>
         <result column="UPDATED_AT" property="updatedAt"/>
         <association property="userProfileVO" resultMap="userProfile"/>
@@ -110,7 +109,7 @@
     <select id="joinCheck" resultType="boolean">
         SELECT COUNT(*)
         FROM USER_PROFILE
-        WHERE USER_EMAIL = #{userEmail}
+        WHERE USER_ID = #{userEmail}
     </select>
 
     <!-- SSO 회원가입 -->
@@ -138,22 +137,9 @@
         )
     </insert>
 
-    <!-- refresh 토큰 용 유저 역할 조회 -->
+    <!-- refresh 토큰 용 유저 정보 조회 -->
     <select id="getRolesByEmail" resultType="String">
         SELECT USER_ROLE
-        FROM USER_PROFILE
-        WHERE USER_EMAIL = #{userEmail}
-    </select>
-
-    <!-- 이용자 정보 조회 -->
-    <select id="selectUserOne" resultMap="userProfile">
-        SELECT USER_EMAIL
-            , USER_ID
-            , USER_PW
-            , USER_NAME
-            , USER_ROLE
-            , CREATED_AT
-            , UPDATED_AT
         FROM USER_PROFILE
         WHERE USER_EMAIL = #{userEmail}
     </select>
