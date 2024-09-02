@@ -23,8 +23,8 @@ public class JwtTokenParser {
     private SqlSessionTemplate sqlSession;
 
     public JwtTokenParser(JwtProperties jwtProperties, JwtTokenValidator jwtTokenValidator){
-        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
-        this.refreshKey = Keys.hmacShaKeyFor(jwtProperties.getRefreshSecretKey().getBytes(StandardCharsets.UTF_8));
+        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecretKey());
+        this.refreshKey = Keys.hmacShaKeyFor(jwtProperties.getRefreshSecretKey());
         this.jwtTokenValidator = jwtTokenValidator;
     }
 

@@ -1,7 +1,9 @@
-import com.bom.shop.security.jwtFacadePattern.JwtProperties;
-import com.bom.shop.security.jwtFacadePattern.JwtTokenGenerator;
+package com.bom.shop.security.jwtFacadePattern;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -9,11 +11,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -22,16 +22,21 @@ class JwtTokenGeneratorTest{
 
     @Mock
     private JwtProperties jwtProperties;
-
     private JwtTokenGenerator jwtTokenGenerator;
+    private SecretKey secretKey;
+    private SecretKey refreshKey;
 
     @BeforeEach
     void setUp(){
         MockitoAnnotations.openMocks(this);
-        when(jwtProperties.getSecretKey()).thenReturn("testSecretKey");
-        when(jwtProperties.getRefreshSecretKey()).thenReturn("testRefreshSecretKey");
         when(jwtProperties.getAccessExpireTime()).thenReturn(3600000L);
         when(jwtProperties.getRefreshExpireTime()).thenReturn(86400000L);
+
+        secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        refreshKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
+        when(jwtProperties.getSecretKey()).thenReturn(secretKey.getEncoded());
+        when(jwtProperties.getRefreshSecretKey()).thenReturn(refreshKey.getEncoded());
 
         jwtTokenGenerator = new JwtTokenGenerator(jwtProperties);
     }
@@ -49,7 +54,7 @@ class JwtTokenGeneratorTest{
         assertNotNull(token);
 
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8))
+                .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -74,7 +79,7 @@ class JwtTokenGeneratorTest{
         assertNotNull(refreshToken);
 
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(jwtProperties.getRefreshSecretKey().getBytes(StandardCharsets.UTF_8))
+                .setSigningKey(refreshKey)
                 .build()
                 .parseClaimsJws(refreshToken)
                 .getBody();

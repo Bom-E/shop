@@ -23,8 +23,8 @@ public class JwtTokenGenerator {
 
     public JwtTokenGenerator(JwtProperties jwtProperties){
         this.jwtProperties = jwtProperties;
-        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
-        this.refreshKey = Keys.hmacShaKeyFor(jwtProperties.getRefreshSecretKey().getBytes(StandardCharsets.UTF_8));
+        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecretKey());
+        this.refreshKey = Keys.hmacShaKeyFor(jwtProperties.getRefreshSecretKey());
     }
 
     public String generateToken(String userEmail, Collection<? extends GrantedAuthority> authorities){

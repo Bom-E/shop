@@ -10,16 +10,17 @@ import org.springframework.stereotype.Service;
 @Service("jwtProperties")
 @ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
-    private String secretKey;
-    private String refreshSecretKey;
+
+    private byte[] secretKey;
+    private byte[] refreshSecretKey;
     private long accessExpireTime;
     private long refreshExpireTime;
 
-    public void setSecretKey(String secretKey){
+    public void setSecretKey(byte[] secretKey){
         this.secretKey = secretKey;
     }
 
-    public void setRefreshSecretKey(String refreshSecretKey){
+    public void setRefreshSecretKey(byte[] refreshSecretKey){
         this.refreshSecretKey = refreshSecretKey;
     }
 

@@ -15,12 +15,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilterTest extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService){
+    public JwtAuthenticationFilterTest(JwtService jwtService, UserDetailsService userDetailsService){
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
     }
