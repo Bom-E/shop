@@ -107,8 +107,8 @@
     </insert>
 
     <!-- 중복가입 방지 -->
-    <select id="joinCheck" resultType="boolean">
-        SELECT COUNT(*)
+    <select id="joinCheck" resultMap="userProfile">
+        SELECT
         FROM USER_PROFILE
         WHERE USER_EMAIL = #{userEmail}
     </select>
@@ -142,20 +142,16 @@
     <select id="getRolesByEmail" resultType="String">
         SELECT USER_ROLE
         FROM USER_PROFILE
-        WHERE USER_EMAIL = #{userEmail}
+        WHERE USER_EMAIL = #{email}
     </select>
 
     <!-- 이용자 정보 조회 -->
-    <select id="selectUserOne" resultMap="userProfile">
-        SELECT USER_EMAIL
-            , USER_ID
-            , USER_PW
-            , USER_NAME
-            , USER_ROLE
-            , CREATED_AT
-            , UPDATED_AT
-        FROM USER_PROFILE
-        WHERE USER_EMAIL = #{userEmail}
+    <select id="findOneByEmail" resultMap="userAccount">
+        SELECT *
+        FROM USER_ACCOUNT UA
+        JOIN USER_PROFILE UP
+        ON UA.USER_ID = UP.USER_ID
+        WHERE UP.USER_EMAIL = #{email}
     </select>
 
 </mapper>

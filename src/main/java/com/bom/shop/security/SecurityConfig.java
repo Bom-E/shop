@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -43,14 +44,21 @@ public class SecurityConfig {
                         // .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .successHandler(new MixAuthenticationSuccessHandler(jwtService, objectMapper))
-                        .failureHandler(new MixAuthenticationFailureHandler(objectMapper))
+                        .loginProcessingUrl("/login")
+                        .successHandler(new SessionAuthenticationSuccessHandler())
+                        .failureHandler(new SessionAuthenticationFailureHandler())
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .successHandler(new MixAuthenticationSuccessHandler(jwtService, objectMapper))
-                        .failureHandler(new MixAuthenticationFailureHandler(objectMapper))
-                );
+                        .successHandler(new TokenAuthenticationSuccessHandler(jwtService, objectMapper))
+                        .failureHandler(new TokenAuthenticationFailureHandler(objectMapper))
+                )
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(){
+        return new JwtAuthenticationFilter(jwtService);
     }
 
     @Bean
