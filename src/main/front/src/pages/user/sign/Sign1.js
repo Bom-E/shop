@@ -18,8 +18,9 @@ const Sign1 = () => {
         setError(null);
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/social-login`, { loginType });
-            console.log('로그인 요청 결과:', response.data);
+            
+            const { data } = await axios.get(`${API_BASE_URL}`);
+
         } catch (error) {
             console.error('로그인 요청 에러:', error);
             setError('로그인 중 오류가 발생했습니다. 다시 시도해 주세요.');
