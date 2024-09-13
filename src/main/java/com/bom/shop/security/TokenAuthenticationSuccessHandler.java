@@ -3,13 +3,11 @@ package com.bom.shop.security;
 import com.bom.shop.security.jwtFacadePattern.JwtService;
 import com.bom.shop.user.service.UserSignService;
 import com.bom.shop.user.vo.UserAccountVO;
-import com.bom.shop.user.vo.UserProfileVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -42,8 +40,8 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
         if(authentication instanceof OAuth2AuthenticationToken){
             OAuth2AuthenticationToken oauth2Token = (OAuth2AuthenticationToken) authentication;
             OAuth2User oAuth2User = oauth2Token.getPrincipal();
-            String loginType = oauth2Token.getAuthorizedClientRegistrationId();
-            String email = extractEmail(oAuth2User, loginType);
+            String registrationId = oauth2Token.getAuthorizedClientRegistrationId();
+            String email = extractEmail(oAuth2User, registrationId);
 
             UserAccountVO user = userSignService.findOneByEmail(email);
             if(user == null){
@@ -51,7 +49,7 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
             }
 
             tokenMap.put("email", email);
-            tokenMap.put("loginType", loginType);
+            tokenMap.put("registrationId", registrationId);
 
         }
 
@@ -60,8 +58,8 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
         response.getWriter().write(objectMapper.writeValueAsString(tokenMap));
     }
 
-    private String extractEmail(OAuth2User oAuth2User, String provider){
-        switch (provider) {
+    private String extractEmail(OAuth2User oAuth2User, String registrationId){
+        switch (registrationId) {
             case "google":
                 return oAuth2User.getAttribute("email");
             case "naver":
@@ -71,7 +69,7 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
                 Map<String, Object> kakaoAttribute = oAuth2User.getAttribute("kakao_account");
                 return (String) kakaoAttribute.get("email");
             default:
-                throw new IllegalArgumentException("Unsupported provider: " + provider);
+                throw new IllegalArgumentException("Unsupported registrationId: " + registrationId);
         }
     }
 

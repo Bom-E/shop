@@ -12,5 +12,4 @@ public class UserAddrVO {
     private String userId;
     private String createdAt;
     private String updatedAt;
-    private UserAccountVO userAccountVO;
 }

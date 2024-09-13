@@ -8,6 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -18,48 +21,40 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest
 class JwtTokenGeneratorTest{
 
-    @Mock
+    @Autowired
+    @Qualifier("jwtProperties")
     private JwtProperties jwtProperties;
+
+    @Autowired
     private JwtTokenGenerator jwtTokenGenerator;
-    private SecretKey secretKey;
-    private SecretKey refreshKey;
 
     @BeforeEach
     void setUp(){
-        MockitoAnnotations.openMocks(this);
-        when(jwtProperties.getAccessExpireTime()).thenReturn(3600000L);
-        when(jwtProperties.getRefreshExpireTime()).thenReturn(86400000L);
-
-        secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        refreshKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-
-        when(jwtProperties.getSecretKey()).thenReturn(secretKey.getEncoded());
-        when(jwtProperties.getRefreshSecretKey()).thenReturn(refreshKey.getEncoded());
-
         jwtTokenGenerator = new JwtTokenGenerator(jwtProperties);
     }
 
     @Test
     void testGenerateToken(){
-        String userEmail = "test@google.com";
+        String email = "test@google.com";
         Collection<GrantedAuthority> authorities = Arrays.asList(
                 new SimpleGrantedAuthority("ROLE_USER")
                 , new SimpleGrantedAuthority("ROLE_ADMIN")
         );
 
-        String token = jwtTokenGenerator.generateToken(userEmail, authorities);
+        String token = jwtTokenGenerator.generateToken(email, authorities);
 
         assertNotNull(token);
 
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+                .setSigningKey(Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8)))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
 
-        assertEquals(userEmail, claims.getSubject());
+        assertEquals(email, claims.getSubject());
         assertTrue(claims.getExpiration().after(new Date()));
         List<String> roles = claims.get("roles", List.class);
         assertTrue(roles.contains("ROLE_USER"));
@@ -71,20 +66,20 @@ class JwtTokenGeneratorTest{
 
     @Test
     void testGenerateRefreshToken(){
-        String userEmail = "test@google.com";
+        String email = "test@google.com";
         List<String> roles = Arrays.asList("ROLE_USER", "ROLE_ADMIN");
 
-        String refreshToken = jwtTokenGenerator.generateRefreshToken(userEmail, roles);
+        String refreshToken = jwtTokenGenerator.generateRefreshToken(email, roles);
 
         assertNotNull(refreshToken);
 
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(refreshKey)
+                .setSigningKey(Keys.hmacShaKeyFor(jwtProperties.getRefreshSecretKey().getBytes(StandardCharsets.UTF_8)))
                 .build()
                 .parseClaimsJws(refreshToken)
                 .getBody();
 
-        assertEquals(userEmail, claims.getSubject());
+        assertEquals(email, claims.getSubject());
         assertTrue(claims.getExpiration().after(new Date()));
 
         long expectedExpiration = claims.getIssuedAt().getTime() + jwtProperties.getRefreshExpireTime();

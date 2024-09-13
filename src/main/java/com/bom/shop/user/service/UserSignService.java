@@ -8,7 +8,11 @@ import java.util.List;
 public interface UserSignService {
 
     // sso 회원가입
-    void joinUser(UserAccountVO userAccountVO, UserProfileVO userProfileVO);
+    void userSignSso(UserAccountVO userAccountVO, UserProfileVO userProfileVO);
+
+    // 로그인
+    UserAccountVO ssoLoginSelect(UserAccountVO userAccountVO);
+
     // refreshToken 갱신
     List<String> getRolesByEmail(UserProfileVO userProfileVO);
 

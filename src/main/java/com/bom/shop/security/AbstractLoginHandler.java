@@ -22,6 +22,6 @@ public class AbstractLoginHandler {
     protected String determineTargetUrl(Authentication authentication){
         // 로그인 성공 후 리다이렉트 할 URL 결정
         // 예: 사용자 역할에 따라 다른 페이지로 리다이렉트
-        return "/dashboard";
+        return "/";
     }
 }

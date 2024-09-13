@@ -16,12 +16,18 @@ public class UserSignServiceImpl implements UserSignService {
     @Autowired
     private SqlSessionTemplate sqlSession;
 
-
+    // 회원가입
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void joinUser(UserAccountVO userAccountVO, UserProfileVO userProfileVO) {
+    public void userSignSso(UserAccountVO userAccountVO, UserProfileVO userProfileVO) {
         sqlSession.insert("userMapper.signUserWithSso1", userAccountVO);
         sqlSession.insert("userMapper.signUserWithSso2", userProfileVO);
+    }
+
+    // 로그인
+    @Override
+    public UserAccountVO ssoLoginSelect(UserAccountVO userAccountVO) {
+        return sqlSession.selectOne("userMapper.ssoLoginSelect", userAccountVO);
     }
 
     @Override

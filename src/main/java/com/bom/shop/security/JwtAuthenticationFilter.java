@@ -28,11 +28,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = extractJwtFromRequest(request);
 
         if(token != null && jwtService.validateToken(token, false)){
-            String userEmail = jwtService.getUserEmail(token, false);
+            String email = jwtService.getEmail(token, false);
             List<String> roles = jwtService.getRoles(token, false);
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userEmail, null, roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+                    email, null, roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

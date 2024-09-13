@@ -3,10 +3,12 @@ package com.bom.shop.security.jwtFacadePattern;
 import com.bom.shop.security.jwtFacadePattern.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service("jwtService")
 public class JwtServiceImpl implements JwtService {
     private final JwtTokenGenerator generator;
     private final JwtTokenValidator validator;
@@ -30,8 +32,8 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String getUserEmail(String token, boolean isRefreshToken) {
-        return parser.getUserEmail(token, isRefreshToken);
+    public String getEmail(String token, boolean isRefreshToken) {
+        return parser.getEmail(token, isRefreshToken);
     }
 
     @Override

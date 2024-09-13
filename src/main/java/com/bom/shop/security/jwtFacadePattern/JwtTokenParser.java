@@ -1,11 +1,14 @@
 package com.bom.shop.security.jwtFacadePattern;
 
+import com.bom.shop.user.service.UserSignService;
+import com.bom.shop.user.vo.UserProfileVO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -15,28 +18,28 @@ import java.util.stream.Collectors;
 
 @Service("jwtTokenParser")
 public class JwtTokenParser {
-    private final Key key;
-    private final Key refreshKey;
+    private final JwtProperties jwtProperties;
     private final JwtTokenValidator jwtTokenValidator;
+    private final UserSignService userSignService;
 
     @Autowired
-    private SqlSessionTemplate sqlSession;
-
-    public JwtTokenParser(JwtProperties jwtProperties, JwtTokenValidator jwtTokenValidator){
-        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecretKey());
-        this.refreshKey = Keys.hmacShaKeyFor(jwtProperties.getRefreshSecretKey());
+    public JwtTokenParser(@Qualifier("jwtProperties") JwtProperties jwtProperties, JwtTokenValidator jwtTokenValidator, UserSignService userSignService){
+        this.jwtProperties = jwtProperties;
         this.jwtTokenValidator = jwtTokenValidator;
+        this.userSignService = userSignService;
     }
 
     private Key getKey(boolean isRefreshToken){
-        return isRefreshToken ? refreshKey : key;
+        String keyString = isRefreshToken ? jwtProperties.getRefreshSecretKey() : jwtProperties.getSecretKey();
+        return Keys.hmacShaKeyFor(keyString.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String getUserEmail(String token, boolean isRefreshToken){
+    public String getEmail(String token, boolean isRefreshToken){
         if(!jwtTokenValidator.isTokenValid(token, isRefreshToken)){
             throw new JwtException("Invalid token");
         }
         Claims claims = getClaims(token, isRefreshToken);
+        System.out.println("Extracted subject: " + claims.getSubject());
         return claims.getSubject();
     }
 
@@ -44,21 +47,31 @@ public class JwtTokenParser {
         if(!jwtTokenValidator.isTokenValid(token, isRefreshToken)){
             throw new JwtException("Invalid token");
         }
+
         Claims claims = getClaims(token, isRefreshToken);
+        UserProfileVO userProfileVO = new UserProfileVO();
+        userProfileVO.setEmail(claims.getSubject());
+
         if(!isRefreshToken && claims.get("roles") != null){
             return claims.get("roles", List.class);
-        }else {
-            String userEmail = claims.getSubject();
-            return sqlSession.selectList("userMapper.getRolesByEmail", userEmail);
+        } else {
+            List<String> roles = userSignService.getRolesByEmail(userProfileVO);
+            return roles;
         }
     }
 
     private Claims getClaims(String token, boolean isRefreshToken){
-        return Jwts.parserBuilder()
-                .setSigningKey(getKey(isRefreshToken))
+        Key key = isRefreshToken ?
+                Keys.hmacShaKeyFor(jwtProperties.getRefreshSecretKey().getBytes(StandardCharsets.UTF_8)) :
+                Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
+
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+        System.out.println("Parsed claims: " + claims);
+        return claims;
     }
 
     public Claims getTokenClaims(String token){

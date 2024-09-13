@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <!-- 해당 파일에 모든 쿼리문을 작성 -->
-<mapper namespace="userMapper">
+<mapper namespace="com.bom.shop.user.mapper.UserMapper">
 
     <resultMap id="userAccount" type="com.bom.shop.user.vo.UserAccountVO">
         <id     column="USER_ID"    property="userId"/>
         <result column="USER_PW"    property="userPw"/>
         <result column="USER_ROLE"  property="userRole"/>
-        <result column="LOGIN_TYPE" property="loginType"/>
+        <result column="REGISTRATION_ID" property="registrationId"/>
         <result column="CREATED_AT" property="createdAt"/>
         <result column="UPDATED_AT" property="updatedAt"/>
         <association property="userProfileVO" resultMap="userProfile"/>
@@ -19,13 +19,12 @@
         <id     column="USER_ID"    property="userId"/>
         <result column="USER_NAME"  property="userName"/>
         <result column="GENDER"     property="gender"/>
-        <result column="USER_EMAIL" property="userEmail"/>
+        <result column="EMAIL"      property="email"/>
         <result column="USER_TEL"   property="userTel"/>
         <result column="BIRTH_DATE" property="birthDate"/>
         <result column="JOIN_DATE"  property="joinDate"/>
         <result column="CREATED_AT" property="createdAt"/>
         <result column="UPDATED_AT" property="updatedAt"/>
-        <association property="userAccountVO" resultMap="userAccount"/>
     </resultMap>
 
     <resultMap id="userAddr" type="com.bom.shop.user.vo.UserAddrVO">
@@ -37,7 +36,6 @@
         <result column="USER_ID"        property="userId"/>
         <result column="CREATED_AT"     property="createdAt"/>
         <result column="UPDATED_AT"     property="updatedAt"/>
-        <association property="userAccountVO" resultMap="userAccount"/>
     </resultMap>
 
     <!-- for로 한번에 데이터를 다 삽입 할 건지, 아니면 각자 삽입 쿼리를 만들건지 -->
@@ -51,7 +49,7 @@
             USER_ID
             , USER_NAME
             , GENDER
-            , USER_EMAIL
+            , EMAIL
             , USER_TEL
             , BIRTH_DATE
             , JOIN_DATE
@@ -61,7 +59,7 @@
             #{userId}
             , #{userName}
             , #{gender}
-            , #{userEmail}
+            , #{email}
             , #{userTel}
             , #{birthDate}
             , #{joinDate}
@@ -110,19 +108,25 @@
     <select id="joinCheck" resultMap="userProfile">
         SELECT
         FROM USER_PROFILE
-        WHERE USER_EMAIL = #{userEmail}
+        WHERE EMAIL = #{email}
     </select>
 
     <!-- SSO 회원가입 -->
     <insert id="signUserWithSso1">
         INSERT INTO USER_ACCOUNT (
             USER_ID
+            , USER-PW
             , USER_ROLE
-            , LOGIN_TYPE
+            , REGISTRATION_ID
+            , CREATED_AT
+            , UPDATED_AT
         ) VALUES(
             #{userId}
+            , #{userPw}
             , #{userRole}
-            , #{loginType}
+            , #{registrationId}
+            , #{createdAt}
+            , #{updatedAt}
         )
     </insert>
 
@@ -130,28 +134,55 @@
         INSERT INTO USER_PROFILE (
             USER_ID
             , USER_NAME
-            , USER_EMAIL
+            , GENDER
+            , EMAIL
+            , USER_TEL
+            , BIRTH_DATE
+            , JOIN_DATE
+            , CREATED_AT
+            , UPDATED_AT
         ) VALUES(
             #{userId}
             , #{userName}
-            , #{userEmail}
+            , #{gender}
+            , #{email}
+            , #{userTel}
+            , #{birthDate}
+            , #{joinDate}
+            , #{createdAt}
+            , #{updatedAt}
         )
     </insert>
+
+    <!-- sso 로그인 -->
+    <select id="ssoLoginSelect" resultMap="userAccount">
+        SELECT UA.USER_ID
+            , EMAIL
+            , USER_ROLE
+            , REGISTRATION_ID
+        FROM USER_ACCOUNT UA
+        JOIN USER_PROFILE UP
+        ON UA.USER_ID = UP.USER_ID
+        WHERE UP.EMAIL = #{email}
+        AND UA.REGISTRATION_ID = #{registrationId}
+    </select>
 
     <!-- refresh 토큰 용 유저 역할 조회 -->
     <select id="getRolesByEmail" resultType="String">
         SELECT USER_ROLE
         FROM USER_PROFILE
-        WHERE USER_EMAIL = #{email}
+        WHERE EMAIL = #{email}
     </select>
 
     <!-- 이용자 정보 조회 -->
     <select id="findOneByEmail" resultMap="userAccount">
-        SELECT *
+        SELECT UA.USER_ID
+            , USER_ROLE
+            , EMAIL
         FROM USER_ACCOUNT UA
         JOIN USER_PROFILE UP
         ON UA.USER_ID = UP.USER_ID
-        WHERE UP.USER_EMAIL = #{email}
+        WHERE UP.EMAIL = #{email}
     </select>
 
 </mapper>

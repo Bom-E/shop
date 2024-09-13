@@ -3,6 +3,7 @@ package com.bom.shop.security.jwtFacadePattern;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
@@ -15,21 +16,28 @@ import java.util.stream.Collectors;
 
 @Service("jwtTokenGenerator")
 public class JwtTokenGenerator {
-    @Autowired
-    private JwtProperties jwtProperties;
-
+    private final JwtProperties jwtProperties;
     private final Key key;
     private final Key refreshKey;
 
-    public JwtTokenGenerator(JwtProperties jwtProperties){
+    @Autowired
+    public JwtTokenGenerator(@Qualifier("jwtProperties") JwtProperties jwtProperties){
         this.jwtProperties = jwtProperties;
-        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecretKey());
-        this.refreshKey = Keys.hmacShaKeyFor(jwtProperties.getRefreshSecretKey());
+        System.out.println("JwtTokenGenerator constructor");
+        System.out.println("Secret Key: " + jwtProperties.getSecretKey());
+        System.out.println("Refresh Key: " + jwtProperties.getRefreshSecretKey());
+
+        if(jwtProperties.getSecretKey() == null || jwtProperties.getRefreshSecretKey() == null){
+            throw new IllegalStateException("Secret keys are not properly initialized");
+        }
+
+        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
+        this.refreshKey = Keys.hmacShaKeyFor(jwtProperties.getRefreshSecretKey().getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(String userEmail, Collection<? extends GrantedAuthority> authorities){
+    public String generateToken(String email, Collection<? extends GrantedAuthority> authorities){
         return Jwts.builder()
-                .setSubject(userEmail)
+                .setSubject(email)
                 .claim("roles", authorities.stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList()))
@@ -39,9 +47,9 @@ public class JwtTokenGenerator {
                 .compact();
     }
 
-    public String generateRefreshToken(String userEmail, List<String> roles){
+    public String generateRefreshToken(String email, List<String> roles){
         return Jwts.builder()
-                .setSubject(userEmail)
+                .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getRefreshExpireTime()))
                 .signWith(refreshKey)

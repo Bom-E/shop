@@ -12,7 +12,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.ssl.SslBundleProperties;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +24,8 @@ import java.awt.*;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 
 
@@ -29,41 +34,33 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest
 class JwtTokenValidatorTest {
 
-    @Mock
+    @Autowired
+    @Qualifier("jwtProperties")
     private JwtProperties jwtProperties;
 
-    private SecretKey secretKey;
-
+    @Autowired
     private JwtTokenValidator jwtTokenValidator;
+
+    @Autowired
+    private JwtTokenGenerator jwtTokenGenerator;
+
+    private Key secretKey;
 
     @BeforeEach
     void setUp(){
-        MockitoAnnotations.openMocks(this);
-
-        secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
-        when(jwtProperties.getSecretKey()).thenReturn(encodedKey.getBytes());
-        when(jwtProperties.getRefreshSecretKey()).thenReturn(encodedKey.getBytes());
-
-        jwtTokenValidator = new JwtTokenValidator(jwtProperties);
-
-        System.out.println("Test setup key: " + encodedKey);
+        secretKey = Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
     }
 
     @Test
     void tokenValidTest(){
-        String validToken = Jwts.builder()
-                .setSubject("user")
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000000))
-                .signWith(secretKey)
-                .compact();
+        String validToken = jwtTokenGenerator.generateToken("user", Collections.emptyList());
 
         System.out.println("Valid token: " + validToken);
         System.out.println("Test key: " + Base64.getEncoder().encodeToString(secretKey.getEncoded()));
-        System.out.println("JwtProperties key: " + Base64.getEncoder().encodeToString(jwtProperties.getSecretKey()));
+        System.out.println("JwtProperties key: " + Base64.getEncoder().encodeToString(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8)));
 
         assertTrue(jwtTokenValidator.isTokenValid(validToken, false), "Valid token should be accepted");
 
@@ -83,26 +80,14 @@ class JwtTokenValidatorTest {
 
         assertTrue(jwtTokenValidator.isTokenExpired(expiredToken, false), "Expired token should be recognized");
 
-        Date futureDate = new Date(System.currentTimeMillis() + 1000000);
-        String validToken = Jwts.builder()
-                .setSubject("user")
-                .setIssuedAt(new Date())
-                .setExpiration(futureDate)
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
+        String validToken = jwtTokenGenerator.generateToken("user", Collections.emptyList());
 
         assertFalse(jwtTokenValidator.isTokenExpired(validToken, false), "Valid token should not be recognized");
     }
 
     @Test
     void refreshTokenTest(){
-        String validRefreshToken = Jwts.builder()
-                .setSubject("user")
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000000))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
-
+        String validRefreshToken = jwtTokenGenerator.generateRefreshToken("user", Collections.singletonList("ROLE_USER"));
         assertTrue(jwtTokenValidator.isTokenValid(validRefreshToken, true), "Valid refresh token should be accepted");
 
         String invalidRefreshToken = "invalidRefreshToken";

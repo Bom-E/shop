@@ -54,16 +54,22 @@ public class TokenAuthenticationFailureHandler implements AuthenticationFailureH
         }
 
         OAuth2User oauth2User = token.getPrincipal();
-        String loginType = token.getAuthorizedClientRegistrationId();
-        String email = extractEmail(oauth2User, loginType);
-        String name = extractName(oauth2User, loginType);
+        String registrationId = token.getAuthorizedClientRegistrationId();
+        String email = extractEmail(oauth2User, registrationId);
 
-        saveUser(email, name, loginType);
+        UserAccountVO userAccountVO = new UserAccountVO();
+        userAccountVO.setRegistrationId(registrationId);
+        userAccountVO.setUserRole("USER");
+
+        UserProfileVO userProfileVO = new UserProfileVO();
+        userProfileVO.setEmail(email);
+
+        saveUser(userAccountVO, userProfileVO);
 
         Map<String, String> userDetail = new HashMap<>();
         userDetail.put("message", "New user registered");
         userDetail.put("email", email);
-        userDetail.put("loginType", loginType);
+        userDetail.put("registrationId", registrationId);
 
         response.setStatus(HttpServletResponse.SC_CREATED);
         response.setContentType("application/json");
@@ -71,8 +77,8 @@ public class TokenAuthenticationFailureHandler implements AuthenticationFailureH
         response.getWriter().write(objectMapper.writeValueAsString(userDetail));
     }
 
-    private String extractEmail(OAuth2User oauth2User, String loginType){
-        switch (loginType) {
+    private String extractEmail(OAuth2User oauth2User, String registrationId){
+        switch (registrationId) {
             case "google":
                 return oauth2User.getAttribute("email");
             case "naver":
@@ -82,37 +88,13 @@ public class TokenAuthenticationFailureHandler implements AuthenticationFailureH
                 Map<String, Object> kakaoAttributes = oauth2User.getAttribute("kakao_account");
                 return (String) kakaoAttributes.get("email");
             default:
-                throw new IllegalArgumentException("Unsupported login type: " + loginType);
+                throw new IllegalArgumentException("Unsupported login type: " + registrationId);
 
         }
     }
 
-    private String extractName(OAuth2User oauth2User, String loginType){
-        switch (loginType) {
-            case "google":
-                return oauth2User.getAttribute("name");
-            case "naver":
-                Map<String, Object> naverAttributes = oauth2User.getAttribute("response");
-                return (String) naverAttributes.get("name");
-            case "kakao":
-                Map<String, Object> kakaoAttributes = oauth2User.getAttribute("kakao_account");
-                Map<String, Object> profile = (Map<String, Object>) kakaoAttributes.get("profile");
-                return (String) profile.get("nickname");
-            default:
-                throw new IllegalArgumentException("Unsupported login type: " + loginType);
+    private void saveUser(UserAccountVO userAccountVO, UserProfileVO userProfileVO){
 
-        }
-
-    }
-
-    private void saveUser(String email, String name, String loginType){
-        UserAccountVO userAccountVO = new UserAccountVO();
-        userAccountVO.setLoginType(loginType);
-
-        UserProfileVO userProfileVO = new UserProfileVO();
-        userProfileVO.setUserEmail(email);
-        userProfileVO.setUserName(name);
-
-        userSignService.joinUser(userAccountVO, userProfileVO);
+        userSignService.userSignSso(userAccountVO, userProfileVO);
     }
 }
