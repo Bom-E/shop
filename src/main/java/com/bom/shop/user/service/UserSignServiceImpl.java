@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service("userSignService")
 public class UserSignServiceImpl implements UserSignService {
@@ -26,8 +28,11 @@ public class UserSignServiceImpl implements UserSignService {
 
     // 로그인
     @Override
-    public UserAccountVO ssoLoginSelect(UserAccountVO userAccountVO) {
-        return sqlSession.selectOne("userMapper.ssoLoginSelect", userAccountVO);
+    public UserAccountVO ssoLoginSelect(String email, String registrationId) {
+        Map<String, String> params = new HashMap<>();
+        params.put("email", email);
+        params.put("registrationId", registrationId);
+        return sqlSession.selectOne("userMapper.ssoLoginSelect", params);
     }
 
     @Override
@@ -40,8 +45,4 @@ public class UserSignServiceImpl implements UserSignService {
         return sqlSession.selectOne("userMapper.joinCheck", email);
     }
 
-    @Override
-    public UserAccountVO findOneByEmail(String email) {
-        return sqlSession.selectOne("userMapper.findOneByEmail", email);
-    }
 }

@@ -7,10 +7,7 @@ import jakarta.annotation.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,25 +20,42 @@ public class UserSignController {
     @Resource(name = "userSignService")
     UserSignService userSignService;
 
-    // 로그인 혹은 회원가입
-    @PostMapping("/sign1")
-    public ResponseEntity<?> userSignSso(UserProfileVO userProfileVO){
+    // 로그인
+    @GetMapping("/sign1")
+    public ResponseEntity<?> getSsoLoginUrls(@RequestParam(name = "email", required = false) String email
+                                            , @RequestParam(name = "registrationId", required = false)String registrationId){
+        UserAccountVO userAccountVO = userSignService.ssoLoginSelect(email, registrationId);
 
-        UserAccountVO user = userSignService.findOneByEmail(userProfileVO.getEmail());
+        if(userAccountVO != null){
 
-        if(user != null){
-
-            return ResponseEntity.ok("User already exists");
+            return ResponseEntity.ok().body(Map.of(
+                    "status", "login"
+                    , "message", "User already exists"
+                    , "userId", userAccountVO.getUserId()
+                    , "userRole", userAccountVO.getUserRole()
+                    , "email", userAccountVO.getUserProfileVO().getEmail()
+                    , "registrationId", userAccountVO.getRegistrationId()));
         } else {
+            Map<String, String> signupInfo = new HashMap<>();
+            signupInfo.put("status", "signup");
+            signupInfo.put("email", email);
+            signupInfo.put("registrationId", registrationId);
 
-            Map<String, String> response = new HashMap<>();
-            response.put("email", userProfileVO.getEmail());
-            response.put("registrationId", user.getRegistrationId());
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.ok().body(signupInfo);
         }
-
     }
+
+    // 회원가입
+//    @PostMapping("/signup")
+//    public ResponseEntity<?> userSignSso(@RequestBody UserAccountVO userAccountVO){
+//
+//        try {
+//            userAccountVO.setUserRole();
+//        } catch () {
+//
+//        }
+//
+//    }
 
 
 }

@@ -115,14 +115,12 @@
     <insert id="signUserWithSso1">
         INSERT INTO USER_ACCOUNT (
             USER_ID
-            , USER-PW
             , USER_ROLE
             , REGISTRATION_ID
             , CREATED_AT
             , UPDATED_AT
         ) VALUES(
             #{userId}
-            , #{userPw}
             , #{userRole}
             , #{registrationId}
             , #{createdAt}
@@ -172,17 +170,6 @@
         SELECT USER_ROLE
         FROM USER_PROFILE
         WHERE EMAIL = #{email}
-    </select>
-
-    <!-- 이용자 정보 조회 -->
-    <select id="findOneByEmail" resultMap="userAccount">
-        SELECT UA.USER_ID
-            , USER_ROLE
-            , EMAIL
-        FROM USER_ACCOUNT UA
-        JOIN USER_PROFILE UP
-        ON UA.USER_ID = UP.USER_ID
-        WHERE UP.EMAIL = #{email}
     </select>
 
 </mapper>

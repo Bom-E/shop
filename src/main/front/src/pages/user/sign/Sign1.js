@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import { useNavigate, useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginSuccess, loginFailure } from "../../../redux/action/userActions";
 
-const API_BASE_URL = 'http://localhost:8081/user/sign1';
+const API_BASE_URL = 'http://localhost:8081/userSign/sign1';
 
 const Sign1 = () => {
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const socialLogins = [
         { name: 'naver', color: 'bg-green-500', text: '네이버', icon: 'N' }
@@ -16,44 +18,42 @@ const Sign1 = () => {
     ];
 
     useEffect(() => {
-
+        console.log("ok")
         const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
+        const email = urlParams.get('email');
+        const registrationId = urlParams.get('registrationId');
 
-        if(token){
-            localStorage.setItem('token', token);
-            window.location.href = '/';
-        }
-    }, []);
+        console.log("Email:", email, "RegistrationId:", registrationId);
 
-    const handleSocialLogin = async (socialName) => {
-        setLoading(true);
-        setError(null);
-
-        try {
-
-            const { data } = await axios.post(`${API_BASE_URL}/oauth2/authorization/${socialName}`);
-            const email = data.email;
-
-            const response = await axios.post(`${API_BASE_URL}`, { email });
-
-            if(response.status === 200){
-                // 이미 회원임
-                navigate("/");
-            }
-
-        } catch (error) {
-
-            if(error.response && error.response.status === 404){
-                // 회원이 없음
-                const { email, registrationId } = error.response.data;
-
-                navigate("/domSignup", { state : { email, registrationId } });
-            } else {
+        if(email && registrationId){
+            console.log("ok");
+            setLoading(true);
+            axios.get(`${API_BASE_URL}?email=${email}&registrationId=${registrationId}`)
+            .then(response => {
+                if(response.data.status === 'login'){
+                    // 이미 회원
+                    dispatch(loginSuccess(response.data));
+                    console.log(response.data);
+                    navigate("/");
+                } else if (response.data.status === 'signup'){
+                    navigate("/domSignup", { state: { email, registrationId } });
+                }
+            })
+            .catch(error => {
                 console.error("Error:", error);
-            }
-
+                dispatch(loginFailure(error.message));
+            })
+            .finally(() => {
+                setLoading(false);
+            })
         }
+
+    }, [navigate, dispatch]);
+
+    const handleSocialLogin = (socialName) => {
+       
+        // 인증 페이지로 리다이렉션
+        window.location.href = `${API_BASE_URL}/oauth2/authorization/${socialName}`;
 
     };
 
@@ -76,7 +76,6 @@ const Sign1 = () => {
                 </button>
                ))}
             </div>
-            {error && <p className="mt-4 text-red-500">{error}</p>}
         </div>
         
     )

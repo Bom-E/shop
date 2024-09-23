@@ -9,32 +9,45 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Map;
 
-@Service("userDetailsService")
-public class CustomUserDetailsServiceImpl implements UserDetailsService {
+@Service("defaultOAuth2UserService")
+public class CustomUserDetailsServiceImpl extends DefaultOAuth2UserService {
 
     @Autowired
     private UserSignService userSignService;
-    // 이 부분은 추후 selectUserOne 을 추상화 한 클래스의 한 메소드로 변경 예정
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserAccountVO userAccountVO = userSignService.findOneByEmail(email);
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        OAuth2User oauth2User = super.loadUser(userRequest);
+
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
+        String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails()
+                                    .getUserInfoEndpoint().getUserNameAttributeName();
+
+        Map<String, Object> attributes = oauth2User.getAttributes();
+
+        String email = (String) attributes.get("email");
+
+        UserAccountVO userAccountVO = userSignService.ssoLoginSelect(email, registrationId);
+
         if(userAccountVO == null){
-            throw new UsernameNotFoundException("User not found with email: " + email);
+            throw new UsernameNotFoundException("User not found");
         }
-        return createUserDetails(userAccountVO);
+
+        return new DefaultOAuth2User(
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + userAccountVO.getUserRole()))
+                , attributes
+                , userNameAttributeName
+        );
     }
 
-    private UserDetails createUserDetails(UserAccountVO userAccountVO){
-
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(userAccountVO.getUserProfileVO().getEmail())
-                .password(userAccountVO.getUserPw())
-                .authorities(Collections.singleton(new SimpleGrantedAuthority("ROLE_" + userAccountVO.getUserRole())))
-                .build();
-    }
 }

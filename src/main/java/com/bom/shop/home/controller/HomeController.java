@@ -9,6 +9,6 @@ public class HomeController {
 
     @GetMapping("/")
     public static String home(){
-        return "forward:/index.html";
+        return "index.html";
     }
 }

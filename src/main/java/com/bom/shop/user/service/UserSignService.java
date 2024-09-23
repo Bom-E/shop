@@ -11,13 +11,11 @@ public interface UserSignService {
     void userSignSso(UserAccountVO userAccountVO, UserProfileVO userProfileVO);
 
     // 로그인
-    UserAccountVO ssoLoginSelect(UserAccountVO userAccountVO);
+    UserAccountVO ssoLoginSelect(String email, String registrationId);
 
     // refreshToken 갱신
     List<String> getRolesByEmail(UserProfileVO userProfileVO);
 
     // 중복가입 방지
     boolean joinCheck(String email);
-
-    UserAccountVO findOneByEmail(String email);
 }

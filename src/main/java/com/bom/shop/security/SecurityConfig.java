@@ -3,6 +3,7 @@ package com.bom.shop.security;
 import com.bom.shop.security.jwtFacadePattern.JwtService;
 import com.bom.shop.user.service.UserSignService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -43,7 +44,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // 혹시 나중에 시간 여유가 되면 추가 보안 설정 해보기
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login/**", "/oauth2/**", "/userSign/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/login/**", "/oauth2/**", "/userSign/**", "/signin/**").permitAll()
                         // .requestMatchers("/user/**").hasRole("USER")
                         // .requestMatchers("/admin/**").hasRole("ADMIN")
                         // .anyRequest().authenticated()
@@ -55,6 +56,12 @@ public class SecurityConfig {
                         )
                         .successHandler(new TokenAuthenticationSuccessHandler(jwtService, objectMapper, userSignService))
                         .failureHandler(new TokenAuthenticationFailureHandler(objectMapper, userSignService))
+                )
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                    .authenticationEntryPoint((request, response, authException) -> {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.getWriter().write("Unauthorized:" + authException.getMessage());
+                    })
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
@@ -88,7 +95,10 @@ public class SecurityConfig {
         return web -> web.ignoring().requestMatchers(
                 "/assets/**"
                 , "/js/**"
+                , "/css/**"
+                , "images/**"
                 , "/favicon.ico"
+                , "index.html"
         );
     }
 }

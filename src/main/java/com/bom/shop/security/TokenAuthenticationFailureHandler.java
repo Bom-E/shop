@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -30,8 +31,14 @@ public class TokenAuthenticationFailureHandler implements AuthenticationFailureH
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         Map<String, String> errorDetail = new HashMap<>();
 
-        if(exception instanceof OAuth2AuthenticationException){
+        if(exception instanceof UsernameNotFoundException){
+
+            handleNewUser(request, response);
+
+        } else if(exception instanceof OAuth2AuthenticationException){
+
             OAuth2AuthenticationException oAuth2Exception = (OAuth2AuthenticationException) exception;
+
             if("User not found".equals(oAuth2Exception.getError().getDescription())){
                 handleNewUser(request, response);
                 return;

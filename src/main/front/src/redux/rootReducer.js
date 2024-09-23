@@ -1,14 +1,8 @@
 import { combineReducers } from 'redux';
-
-const userSign = (state={}, action) => {
-    switch(action.type){
-        default:
-        return state;
-    }
-};
+import userReducer from './reducers/userReducer';
 
 const rootReducer = combineReducers({
-    user : userSign
+    user : userReducer
 });
 
 export default rootReducer;
