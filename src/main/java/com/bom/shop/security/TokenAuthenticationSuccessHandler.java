@@ -43,7 +43,11 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
             String registrationId = oauth2Token.getAuthorizedClientRegistrationId();
             String email = extractEmail(oAuth2User, registrationId);
 
-            UserAccountVO user = userSignService.ssoLoginSelect(email, registrationId);
+            Map<String, String> params = new HashMap<>();
+            params.put("email", email);
+            params.put("registrationId", registrationId);
+
+            UserAccountVO user = userSignService.ssoLoginSelect(params);
             if(user == null){
                 throw new OAuth2AuthenticationException("User not found");
             }

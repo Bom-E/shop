@@ -28,10 +28,8 @@ public class UserSignServiceImpl implements UserSignService {
 
     // 로그인
     @Override
-    public UserAccountVO ssoLoginSelect(String email, String registrationId) {
-        Map<String, String> params = new HashMap<>();
-        params.put("email", email);
-        params.put("registrationId", registrationId);
+    public UserAccountVO ssoLoginSelect(Map<String, String> params) {
+
         return sqlSession.selectOne("userMapper.ssoLoginSelect", params);
     }
 

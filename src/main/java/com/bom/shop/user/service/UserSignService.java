@@ -4,6 +4,7 @@ import com.bom.shop.user.vo.UserAccountVO;
 import com.bom.shop.user.vo.UserProfileVO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserSignService {
 
@@ -11,7 +12,7 @@ public interface UserSignService {
     void userSignSso(UserAccountVO userAccountVO, UserProfileVO userProfileVO);
 
     // 로그인
-    UserAccountVO ssoLoginSelect(String email, String registrationId);
+    UserAccountVO ssoLoginSelect(Map<String, String> params);
 
     // refreshToken 갱신
     List<String> getRolesByEmail(UserProfileVO userProfileVO);

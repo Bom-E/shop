@@ -24,7 +24,16 @@ public class UserSignController {
     @GetMapping("/sign1")
     public ResponseEntity<?> getSsoLoginUrls(@RequestParam(name = "email", required = false) String email
                                             , @RequestParam(name = "registrationId", required = false)String registrationId){
-        UserAccountVO userAccountVO = userSignService.ssoLoginSelect(email, registrationId);
+
+        if(email == null || registrationId == null){
+            return ResponseEntity.badRequest().body("Email and registrationId are required");
+        }
+
+        Map<String, String> params = new HashMap<>();
+        params.put("email", email);
+        params.put("registrationId", registrationId);
+
+        UserAccountVO userAccountVO = userSignService.ssoLoginSelect(params);
 
         if(userAccountVO != null){
 

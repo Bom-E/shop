@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service("defaultOAuth2UserService")
@@ -37,7 +38,11 @@ public class CustomUserDetailsServiceImpl extends DefaultOAuth2UserService {
 
         String email = (String) attributes.get("email");
 
-        UserAccountVO userAccountVO = userSignService.ssoLoginSelect(email, registrationId);
+        Map<String, String> params = new HashMap<>();
+        params.put("email", email);
+        params.put("registrationId", registrationId);
+
+        UserAccountVO userAccountVO = userSignService.ssoLoginSelect(params);
 
         if(userAccountVO == null){
             throw new UsernameNotFoundException("User not found");
