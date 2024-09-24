@@ -53,7 +53,7 @@ const Sign1 = () => {
     const handleSocialLogin = (socialName) => {
        
         // 인증 페이지로 리다이렉션
-        window.location.href = `${API_BASE_URL}/oauth2/authorization/${socialName}`;
+        window.location.href = `http://localhost:8081/oauth2/authorization/${socialName}`;
 
     };
 
