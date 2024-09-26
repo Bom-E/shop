@@ -1,4 +1,4 @@
-import { LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT } from "../actionType";
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     isLoggedIn: false
@@ -6,32 +6,28 @@ const initialState = {
         , error: null
 };
 
-const userReducer = (state = initialState, action) => {
-    switch(action.type){
-        case LOGIN_SUCCESS:
-            return {
-                ...state
-                , isLoggedIn: true
-                , user: action.payload
-                , error: null
-            };
-        case LOGIN_FAILURE:
-            return {
-                ...state
-                , isLoggedIn: false
-                , user: null
-                , error: action.payload
-            };
-        case LOGOUT:
-            return {
-                ...state
-                , isLoggedIn: false
-                , user: null
-                , error: null
-            };
-        default:
-            return state;
+const userSlice = createSlice({
+    name: 'user'
+    , initialState
+    , reducers: {
+        loginSuccess: (state, action) => {
+            state.isLoggedIn = true;
+            state.user = action.payload;
+            state.error = null;
+        },
+        loginFailure: (state, action) => {
+            state.isLoggedIn = false;
+            state.user = null;
+            state.error = action.payload;
+        },
+        logout: (state) => {
+            state.isLoggedIn = false;
+            state.user = null;
+            state.error = null;
+        }
     }
-};
+})
 
-export default userReducer;
+export const { loginSuccess, loginFailure, logout } = userSlice.actions;
+
+export default userSlice.reducer;

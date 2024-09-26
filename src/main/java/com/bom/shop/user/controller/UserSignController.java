@@ -21,7 +21,7 @@ public class UserSignController {
     UserSignService userSignService;
 
     // 로그인
-    @GetMapping("/sign1")
+    @GetMapping("/login")
     public ResponseEntity<?> getSsoLoginUrls(@RequestParam(name = "email", required = false) String email
                                             , @RequestParam(name = "registrationId", required = false)String registrationId){
 
@@ -55,11 +55,13 @@ public class UserSignController {
     }
 
     // 회원가입
-//    @PostMapping("/signup")
-//    public ResponseEntity<?> userSignSso(@RequestBody UserAccountVO userAccountVO){
+//    @PostMapping("/sign1")
+//    public ResponseEntity<?> userSignSso(@RequestBody UserAccountVO userAccountVO, @RequestBody UserProfileVO userProfileVO){
 //
 //        try {
-//            userAccountVO.setUserRole();
+//            if(){
+//
+//            }
 //        } catch () {
 //
 //        }

@@ -21,7 +21,7 @@ const Navigation = ({navItems, isActive, navigateTo, className = ''}) => {
                     ))}
                 </ul>
                 <div className="flex space-x-4">
-                    <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                    <button onClick={() => navigateTo('/userSign/login')} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
                         로그인
                     </button>
                     <button onClick={() => navigateTo('/userSign/sign1')} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">

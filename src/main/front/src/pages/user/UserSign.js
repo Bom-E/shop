@@ -1,37 +1,42 @@
-import React from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { signItems } from "../../routes";
+import React, { useState } from "react";
+import springLogo from '../../assets/with_Spring_removebg.png';
+import Sign1 from "./sign/Sign1";
+import Sign2 from "./sign/Sign2";
 
 const UserSign = ({ className = '' }) => {
-    const location = useLocation();
-    const navigate = useNavigate();
-
-    const checkActive = (path) => location.pathname.endsWith(path);
-    const signNavi = (path) => navigate(`/userSign/${path}`);
+    const [signupType, setsignupType] = useState('domestic');
 
     return(
-        <div>
-            <nav className={`border-gray-200 dark:bg-gray-900 flex items-center justify-center h-16 ${className}`}>
-                <div className="max-w-screen-xl flex flex-wrap items-center justify-center mx-auto p-4">
-                    <ul className="font-medium flex w-full justify-between items-center space-x-0 mt-0 border-0">
-                        {signItems.map(({path, label}) => (
-                            <li key={path} className="flex-1 h-full">
-                                <button
-                                    onClick={() => signNavi(path)}
-                                    className={`w-full h-20 flex items-center justify-center mr-40 ${
-                                        checkActive(path)
-                                            ? 'text-white bg-blue-700'
-                                            : 'bg-white text-gray-900 hover:bg-gray-100'
-                                        } appearance-auto`} aria-current={checkActive(path) ? 'page' : undefined}>
-                                    {label}
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </nav>
-            <hr className="mt-2"></hr>
-            <Outlet/>
+        <div className="flex flex-col items-center min-h-screen">
+            <div className="flex justify-center items-center w-full mt-8 mb-4">
+                <img src={springLogo} alt="Spring Logo" onClick={``} className="w-40 h-40 items-center object-contain"/>
+            </div>
+            <div className="flex space-x-4 mb-8">
+                <button 
+                    className={`rounded-md border px-6 py-2 ${
+                        signupType === 'domestic'
+                        ? 'border-blue-500 text-blue-500'
+                        : 'border-gray-300 text-gray-500 hover:border-blue-300 hover:text-blue-300'
+                    }`}
+                    onClick={() => setsignupType('domestic')}
+                >
+                    국내 회원
+                </button>
+                <button 
+                    className={`rounded-md border px-6 py-2 ${
+                        signupType === 'foreign'
+                        ? 'border-blue-500 text-blue-500'
+                        : 'border-gray-300 text-gray-500 hover:border-blue-300 hover:text-blue-300'
+                    }`}
+                    onClick={() => setsignupType('foreign')}
+                >
+                    해외 회원
+                </button>
+            </div>
+            <div className={`w-full h-auto px-4 ${className}`}>
+                {signupType === 'domestic' ? <Sign1 /> : <Sign2 />}
+            </div>
+            
         </div>
     );
 }
