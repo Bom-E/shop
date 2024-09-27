@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,14 +50,16 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
 
             UserAccountVO user = userSignService.ssoLoginSelect(params);
             if(user == null){
-                throw new OAuth2AuthenticationException("User not found");
+                // 회원가입
+                tokenMap.put("isNewUser", "true");
+                tokenMap.put("redirectUrl", "/userSign/donSignup");
+            } else {
+                tokenMap.put("isNewUser", "false");
+                tokenMap.put("redirectUrl", "/");
             }
-
             tokenMap.put("email", email);
             tokenMap.put("registrationId", registrationId);
-
         }
-
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(tokenMap));

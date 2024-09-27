@@ -2,14 +2,16 @@ import React, { useState } from "react";
 import springLogo from '../../assets/with_Spring_removebg.png';
 import Sign1 from "./sign/Sign1";
 import Sign2 from "./sign/Sign2";
+import { useNavigate } from "react-router-dom";
 
 const UserSign = ({ className = '' }) => {
     const [signupType, setsignupType] = useState('domestic');
+    const navigate = useNavigate();
 
     return(
         <div className="flex flex-col items-center min-h-screen">
             <div className="flex justify-center items-center w-full mt-8 mb-4">
-                <img src={springLogo} alt="Spring Logo" onClick={``} className="w-40 h-40 items-center object-contain"/>
+                <img src={springLogo} alt="Spring Logo" onClick={() => navigate("/")} className="w-40 h-40 items-center object-contain"/>
             </div>
             <div className="flex space-x-4 mb-8">
                 <button 

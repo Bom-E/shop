@@ -44,16 +44,22 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // 혹시 나중에 시간 여유가 되면 추가 보안 설정 해보기
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index.html", "/login/**", "/oauth2/**", "/userSign/**", "/signin/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/login/**", "/oauth2/**", "/userSign/**", "/api/**").permitAll()
                         // .requestMatchers("/user/**").hasRole("USER")
                         // .requestMatchers("/admin/**").hasRole("ADMIN")
                         // .anyRequest().authenticated()
                 )
+                .formLogin(form -> form
+                        .loginPage("/userSign/login")
+                        .loginProcessingUrl("/userSign/login")
+                        .successHandler(new TokenAuthenticationSuccessHandler(jwtService, objectMapper, userSignService))
+                        .failureHandler(new TokenAuthenticationFailureHandler(objectMapper, userSignService))
+                )
                 .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/userSign/sign1")
-                        .redirectionEndpoint(endpoint -> endpoint
-                                .baseUri("/login/oauth2/code/*")
-                        )
+                        .authorizationEndpoint(authorization -> authorization
+                                .baseUri("/oauth2/authorization"))
+                        .redirectionEndpoint(redirection -> redirection
+                                .baseUri("/login/oauth2/code/*"))
                         .successHandler(new TokenAuthenticationSuccessHandler(jwtService, objectMapper, userSignService))
                         .failureHandler(new TokenAuthenticationFailureHandler(objectMapper, userSignService))
                 )
@@ -80,7 +86,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3030"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         configuration.setAllowCredentials(true);

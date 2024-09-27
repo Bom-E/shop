@@ -1,8 +1,14 @@
-import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
-const DomSign = () => {
-    const location = useLocation();
-    const { email, registrationId } = location.state || {};
+const DomSignup = () => {
+    const navigate = useNavigate();
+    const { email, registrationId, isNewUser } = useSelector(state => state.auth.user)
+
+    if(!isNewUser){
+        navigate("/")
+        return null;
+    }
 
     return(
         <div className="flex">
@@ -70,4 +76,4 @@ const DomSign = () => {
     )
 };
 
-export default DomSign;
+export default DomSignup;

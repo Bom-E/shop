@@ -7,7 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -29,79 +31,60 @@ public class TokenAuthenticationFailureHandler implements AuthenticationFailureH
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        Map<String, String> errorDetail = new HashMap<>();
+        Map<String, Object> responseBody = new HashMap<>();
 
-        if(exception instanceof UsernameNotFoundException){
+        if (exception instanceof OAuth2AuthenticationException) {
+            OAuth2AuthenticationException oauth2Exception = (OAuth2AuthenticationException) exception;
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            handleNewUser(request, response);
+            if (authentication instanceof OAuth2AuthenticationToken) {
+                OAuth2AuthenticationToken oAuth2Token = (OAuth2AuthenticationToken) authentication;
+                OAuth2User oAuth2User = oAuth2Token.getPrincipal();
+                String registrationId = oAuth2Token.getAuthorizedClientRegistrationId();
+                String email = extractEmail(oAuth2User, registrationId);
 
-        } else if(exception instanceof OAuth2AuthenticationException){
-
-            OAuth2AuthenticationException oAuth2Exception = (OAuth2AuthenticationException) exception;
-
-            if("User not found".equals(oAuth2Exception.getError().getDescription())){
-                handleNewUser(request, response);
-                return;
+                if ("User not found".equals(exception.getMessage())) {
+                    responseBody.put("isNewUser", true);
+                    responseBody.put("email", email);
+                    responseBody.put("registrationId", registrationId);
+                    response.setStatus(HttpServletResponse.SC_OK);
+                } else {
+                    responseBody.put("error", "OAuth2 Authentication failed");
+                    responseBody.put("message", exception.getMessage());
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                }
+            } else {
+                responseBody.put("error", "OAuth2 Authentication failed");
+                responseBody.put("message", "OAuth2 user information not available");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             }
+        } else if (exception instanceof UsernameNotFoundException) {
+            responseBody.put("error", "User not found");
+            responseBody.put("message", exception.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        } else {
+            responseBody.put("error", "Authentication failed");
+            responseBody.put("message", exception.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
 
-        errorDetail.put("error", "Authentication failed");
-        errorDetail.put("message", exception.getMessage());
-
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(objectMapper.writeValueAsString(errorDetail));
+        response.getWriter().write(objectMapper.writeValueAsString(responseBody));
     }
 
-    private void handleNewUser(HttpServletRequest request, HttpServletResponse response) throws IOException{
-        OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) request.getAttribute("oauth2Token");
-        if(token == null){
-            throw  new IllegalStateException("OAuth2 token not found in request attributes");
-        }
-
-        OAuth2User oauth2User = token.getPrincipal();
-        String registrationId = token.getAuthorizedClientRegistrationId();
-        String email = extractEmail(oauth2User, registrationId);
-
-        UserAccountVO userAccountVO = new UserAccountVO();
-        userAccountVO.setRegistrationId(registrationId);
-        userAccountVO.setUserRole("USER");
-
-        UserProfileVO userProfileVO = new UserProfileVO();
-        userProfileVO.setEmail(email);
-
-        saveUser(userAccountVO, userProfileVO);
-
-        Map<String, String> userDetail = new HashMap<>();
-        userDetail.put("message", "New user registered");
-        userDetail.put("email", email);
-        userDetail.put("registrationId", registrationId);
-
-        response.setStatus(HttpServletResponse.SC_CREATED);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(objectMapper.writeValueAsString(userDetail));
-    }
-
-    private String extractEmail(OAuth2User oauth2User, String registrationId){
+    private String extractEmail(OAuth2User oAuth2User, String registrationId) {
         switch (registrationId) {
             case "google":
-                return oauth2User.getAttribute("email");
+                return oAuth2User.getAttribute("email");
             case "naver":
-                Map<String, Object> naverAttributes = oauth2User.getAttribute("response");
-                return (String) naverAttributes.get("email");
+                Map<String, Object> naverAttribute = oAuth2User.getAttribute("response");
+                return (String) naverAttribute.get("email");
             case "kakao":
-                Map<String, Object> kakaoAttributes = oauth2User.getAttribute("kakao_account");
-                return (String) kakaoAttributes.get("email");
+                Map<String, Object> kakaoAttribute = oAuth2User.getAttribute("kakao_account");
+                return (String) kakaoAttribute.get("email");
             default:
-                throw new IllegalArgumentException("Unsupported login type: " + registrationId);
-
+                throw new IllegalArgumentException("Unsupported registrationId: " + registrationId);
         }
-    }
-
-    private void saveUser(UserAccountVO userAccountVO, UserProfileVO userProfileVO){
-
-        userSignService.userSignSso(userAccountVO, userProfileVO);
     }
 }

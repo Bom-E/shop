@@ -7,7 +7,10 @@ import UserSign from '../pages/user/UserSign';
 import Sign1 from '../pages/user/sign/Sign1';
 import Sign2 from '../pages/user/sign/Sign2';
 import { Navigate } from 'react-router-dom';
-// import Sign3 from '../pages/user/sign/Sign3';
+import DomSignup from '../pages/user/sign/DomSignup';
+import ForSignup from '../pages/user/sign/ForSignup';
+import LoginPage from '../pages/user/login/LoginPage';
+
 
 export const navItems = [
     {path : '/', label : 'Home', component : Home}
@@ -33,8 +36,11 @@ const routes = [
                 path: item.path
                 , element : < item.component />
             }))
+            , { path: 'domSignup', element: <DomSignup /> }
+            , { path: 'forSignup', element: <ForSignup /> }
         ]
     }
+    , { path: 'login', element: <LoginPage /> }
 ];
 
 export default routes;
