@@ -55,7 +55,7 @@ public class UserSignController {
     }
 
     // 회원가입
-//    @PostMapping("/sign1")
+//    @PostMapping("/sign1/domSignup")
 //    public ResponseEntity<?> userSignSso(@RequestBody UserAccountVO userAccountVO, @RequestBody UserProfileVO userProfileVO){
 //
 //        try {

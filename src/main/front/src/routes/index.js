@@ -14,8 +14,8 @@ import LoginPage from '../pages/user/login/LoginPage';
 
 export const navItems = [
     {path : '/', label : 'Home', component : Home}
-    , {path : '/domestic', label : '국내도서', component : Domestic}
-    , {path : '/foreign' , label : '해외도서', component : Foreign}
+    , {path : '/domestic', label : '국내 도서', component : Domestic}
+    , {path : '/foreign' , label : '해외 도서', component : Foreign}
     , {path : '/goods', label : '굿즈', component : Goods}
     , {path : '/events', label : '이벤트', component : Events}
 ];

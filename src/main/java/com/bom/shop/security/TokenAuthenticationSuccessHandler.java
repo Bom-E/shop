@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -34,10 +35,6 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
         String accessToken = jwtService.generateToken(authentication);
         String refreshToken = jwtService.generateToken(authentication);
 
-        Map<String, String> tokenMap = new HashMap<>();
-        tokenMap.put("accessToken", accessToken);
-        tokenMap.put("refreshToken", refreshToken);
-
         if(authentication instanceof OAuth2AuthenticationToken){
             OAuth2AuthenticationToken oauth2Token = (OAuth2AuthenticationToken) authentication;
             OAuth2User oAuth2User = oauth2Token.getPrincipal();
@@ -49,20 +46,32 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
             params.put("registrationId", registrationId);
 
             UserAccountVO user = userSignService.ssoLoginSelect(params);
+            String targetUrl = "";
             if(user == null){
                 // 회원가입
-                tokenMap.put("isNewUser", "true");
-                tokenMap.put("redirectUrl", "/userSign/donSignup");
+                targetUrl = UriComponentsBuilder.fromUriString("/userSign/sign1/domSignup")
+                        .queryParam("accessToken", accessToken)
+                        .queryParam("refreshToken", refreshToken)
+                        .queryParam("email", email)
+                        .queryParam("registrationId", registrationId)
+                        .queryParam("isNewUser", "true")
+                        .build().toUriString();
             } else {
-                tokenMap.put("isNewUser", "false");
-                tokenMap.put("redirectUrl", "/");
+                targetUrl = UriComponentsBuilder.fromUriString("/")
+                        .queryParam("accessToken", accessToken)
+                        .queryParam("refreshToken", refreshToken)
+                        .build().toUriString();
             }
-            tokenMap.put("email", email);
-            tokenMap.put("registrationId", registrationId);
+            response.sendRedirect(targetUrl);
+        } else {
+          // sso 말고 토큰
+          Map<String, String> toeknMap = new HashMap<>();
+          toeknMap.put("accessToken", accessToken);
+          toeknMap.put("refreshToken", refreshToken);
+          response.setContentType("application/json");
+          response.setCharacterEncoding("UTF-8");
+          response.getWriter().write(objectMapper.writeValueAsString(toeknMap));
         }
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(objectMapper.writeValueAsString(tokenMap));
     }
 
     private String extractEmail(OAuth2User oAuth2User, String registrationId){
