@@ -1,5 +1,6 @@
 package com.bom.shop.user.controller;
 
+import com.bom.shop.security.jwtFacadePattern.JwtService;
 import com.bom.shop.user.service.UserSignService;
 import com.bom.shop.user.vo.UserAccountVO;
 import com.bom.shop.user.vo.UserProfileVO;
@@ -17,6 +18,7 @@ import java.util.Map;
 @RequestMapping("/userSign")
 @CrossOrigin(origins = "http://localhost:3000")
 public class UserSignController {
+    JwtService jwtService;
     @Resource(name = "userSignService")
     UserSignService userSignService;
 
@@ -54,19 +56,41 @@ public class UserSignController {
         }
     }
 
+    // 엑세스 토큰 체크
+    @GetMapping("/checkToken")
+    public ResponseEntity<?> checkToken(@CookieValue("access_token") String accessToken){
+        if(jwtService.validateToken(accessToken, false)){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
     // 회원가입
-//    @PostMapping("/sign1/domSignup")
-//    public ResponseEntity<?> userSignSso(@RequestBody UserAccountVO userAccountVO, @RequestBody UserProfileVO userProfileVO){
-//
-//        try {
-//            if(){
-//
-//            }
-//        } catch () {
-//
-//        }
-//
-//    }
+    @PostMapping("/sign1/domSignup")
+    public ResponseEntity<?> userSignSso(@RequestBody Map<String, Object> signupData
+                                        , @CookieValue("access_token") String accessToken){
+        if(!jwtService.validateToken(accessToken, false)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            UserAccountVO userAccountVO = new UserAccountVO();
+            UserProfileVO userProfileVO = new UserProfileVO();
+
+            userAccountVO.setUserId((String) signupData.get("userId"));
+            userAccountVO.setUserRole((String) signupData.get("userRole"));
+            userAccountVO.setRegistrationId((String) signupData.get("registrationId"));
+
+            userProfileVO.setEmail((String) signupData.get("email"));
+
+            userSignService.userSignSso(userAccountVO, userProfileVO);
+            return ResponseEntity.ok().body(Map.of("message", "Signup successful"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+
+    }
 
 
 }

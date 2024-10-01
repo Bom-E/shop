@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import springLogo from '../../assets/with_Spring_removebg.png';
 import Sign1 from "./sign/Sign1";
 import Sign2 from "./sign/Sign2";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
 const UserSign = ({ className = '' }) => {
     const [signupType, setsignupType] = useState('domestic');
@@ -38,7 +38,7 @@ const UserSign = ({ className = '' }) => {
             <div className={`w-full h-auto px-4 ${className}`}>
                 {signupType === 'domestic' ? <Sign1 /> : <Sign2 />}
             </div>
-            
+            <Outlet />
         </div>
     );
 }

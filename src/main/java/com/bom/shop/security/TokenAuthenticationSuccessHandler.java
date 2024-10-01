@@ -5,6 +5,7 @@ import com.bom.shop.user.service.UserSignService;
 import com.bom.shop.user.vo.UserAccountVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -35,6 +36,9 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
         String accessToken = jwtService.generateToken(authentication);
         String refreshToken = jwtService.generateToken(authentication);
 
+        addTokenCookie(response, "access_token", accessToken);
+        addTokenCookie(response, "refresh_token", refreshToken);
+
         if(authentication instanceof OAuth2AuthenticationToken){
             OAuth2AuthenticationToken oauth2Token = (OAuth2AuthenticationToken) authentication;
             OAuth2User oAuth2User = oauth2Token.getPrincipal();
@@ -49,25 +53,19 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
             String targetUrl = "";
             if(user == null){
                 // 회원가입
-                targetUrl = UriComponentsBuilder.fromUriString("/userSign/sign1/domSignup")
-                        .queryParam("accessToken", accessToken)
-                        .queryParam("refreshToken", refreshToken)
+                targetUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/userSign/sign1/domSignup")
                         .queryParam("email", email)
                         .queryParam("registrationId", registrationId)
                         .queryParam("isNewUser", "true")
                         .build().toUriString();
             } else {
-                targetUrl = UriComponentsBuilder.fromUriString("/")
-                        .queryParam("accessToken", accessToken)
-                        .queryParam("refreshToken", refreshToken)
-                        .build().toUriString();
+                targetUrl = "http://localhost:3000/";
             }
             response.sendRedirect(targetUrl);
         } else {
           // sso 말고 토큰
           Map<String, String> toeknMap = new HashMap<>();
-          toeknMap.put("accessToken", accessToken);
-          toeknMap.put("refreshToken", refreshToken);
+          toeknMap.put("message", "Login successful");
           response.setContentType("application/json");
           response.setCharacterEncoding("UTF-8");
           response.getWriter().write(objectMapper.writeValueAsString(toeknMap));
@@ -87,6 +85,15 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
             default:
                 throw new IllegalArgumentException("Unsupported registrationId: " + registrationId);
         }
+    }
+
+    private void addTokenCookie(HttpServletResponse response, String name, String value){
+        Cookie cookie = new Cookie(name, value);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(3600);
+        response.addCookie(cookie);
     }
 
 }

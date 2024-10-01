@@ -28,19 +28,20 @@ export const signItems = [
 const routes = [
     ...navItems
     , {
-        path : '/userSign'
-        , component : UserSign
+        path : 'userSign'
+        , element : <UserSign />
         , children : [
             { index : true, element : <Navigate to="sign1" replace /> }
             , ...signItems.map(item => ({
                 path: item.path
-                , element : < item.component />
+                , element : <item.component />
             }))
-            , { path: 'domSignup', element: <DomSignup /> }
-            , { path: 'forSignup', element: <ForSignup /> }
+            , { path: 'sign1/domSignup', element: <DomSignup /> }
+            , { path: 'sign2/forSignup', element: <ForSignup /> }
         ]
     }
     , { path: 'login', element: <LoginPage /> }
+    , { path: 'signup', element: <DomSignup /> }
 ];
 
 export default routes;

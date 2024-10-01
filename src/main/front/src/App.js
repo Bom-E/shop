@@ -38,8 +38,7 @@ function AppContent() {
   const isActive = (path) => location.pathname === path;
   const navigateTo = (path) => navigate(path);
 
-  const hideHederFooter = location.pathname.includes('userSign');
-
+  const hideHederFooter = location.pathname.includes('userSign') || location.pathname.includes('signup');
 
   return (
     
@@ -57,20 +56,22 @@ function AppContent() {
       <main className="flex-grow container mx-auto px-4 py-8 overflow-auto">
         <div>
           <Routes>
-            {routes.map( route =>
-              route.children ? (
-                <Route key={route.path} path={route.path} element={<route.component/>}>
-                  {route.children.map(childRoute => (
-                    <Route key={childRoute.path || 'index'} index={childRoute.index} path={childRoute.path} element={childRoute.element || <childRoute.component/>}/>
-                  ))}
-                </Route>
-              ) : (
-                <Route key={route.path} path={route.path} element={<route.component/>}/>
-              )
-            )}
+            {routes.map((route, index) => (
+              <Route 
+                key={index}
+                path={route.path}
+                element={route.element || <route.component />}>
+                {route.children && route.children.map((childRoute, childIndex) => (
+                  <Route
+                    key={childIndex}
+                    index={childRoute.index}
+                    path={childRoute.path}
+                    element={childRoute.element || <childRoute.component />}/>
+                ))}
+              </Route>
+            ))}
           </Routes>
-        </div>
-        
+        </div>  
       </main>
 
       {!hideHederFooter && <UserFooter/>}
