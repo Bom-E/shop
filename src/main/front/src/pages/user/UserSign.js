@@ -2,14 +2,17 @@ import React, { useState } from "react";
 import springLogo from '../../assets/with_Spring_removebg.png';
 import Sign1 from "./sign/Sign1";
 import Sign2 from "./sign/Sign2";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 const UserSign = ({ className = '' }) => {
-    const [signupType, setsignupType] = useState('domestic');
     const navigate = useNavigate();
+    const location = useLocation();
+    const [signupType, setsignupType] = useState('domestic');
+    const isDomSignup = location.pathname.includes('signup');
 
     return(
-        <div className="flex flex-col items-center min-h-screen">
+        <div>
+            <div className="flex flex-col items-center min-h-screen">
             <div className="flex justify-center items-center w-full mt-8 mb-4">
                 <img src={springLogo} alt="Spring Logo" onClick={() => navigate("/")} className="w-40 h-40 items-center object-contain"/>
             </div>
@@ -20,8 +23,7 @@ const UserSign = ({ className = '' }) => {
                         ? 'border-blue-500 text-blue-500'
                         : 'border-gray-300 text-gray-500 hover:border-blue-300 hover:text-blue-300'
                     }`}
-                    onClick={() => setsignupType('domestic')}
-                >
+                    onClick={() => setsignupType('domestic')}>
                     국내 회원
                 </button>
                 <button 
@@ -30,15 +32,16 @@ const UserSign = ({ className = '' }) => {
                         ? 'border-blue-500 text-blue-500'
                         : 'border-gray-300 text-gray-500 hover:border-blue-300 hover:text-blue-300'
                     }`}
-                    onClick={() => setsignupType('foreign')}
-                >
+                    onClick={() => setsignupType('foreign')}>
                     해외 회원
                 </button>
             </div>
             <div className={`w-full h-auto px-4 ${className}`}>
                 {signupType === 'domestic' ? <Sign1 /> : <Sign2 />}
             </div>
-            <Outlet />
+        </div>
+        
+            {/* <Outlet /> */}
         </div>
     );
 }

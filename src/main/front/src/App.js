@@ -38,7 +38,7 @@ function AppContent() {
   const isActive = (path) => location.pathname === path;
   const navigateTo = (path) => navigate(path);
 
-  const hideHederFooter = location.pathname.includes('userSign') || location.pathname.includes('signup');
+  const hideHederFooter = location.pathname.includes('userSign') || location.pathname.includes('domSignup');
 
   return (
     

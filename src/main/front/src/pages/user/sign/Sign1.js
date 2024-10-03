@@ -57,7 +57,7 @@ const Sign1 = () => {
     };
 
     const handleNormalSignup = () => {
-        navigate('/signup');
+        navigate('/userSign/sign1/signup');
     }
 
     return(

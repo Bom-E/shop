@@ -36,12 +36,13 @@ const routes = [
                 path: item.path
                 , element : <item.component />
             }))
-            , { path: 'sign1/domSignup', element: <DomSignup /> }
-            , { path: 'sign2/forSignup', element: <ForSignup /> }
         ]
     }
     , { path: 'login', element: <LoginPage /> }
-    , { path: 'signup', element: <DomSignup /> }
+    , { path: 'userSign/sign1/domSignup', element: <DomSignup /> }
+    , { path: 'userSign/sign1/signup', element: <DomSignup /> }
+    , { path: 'userSign/sign2/forSignup', element: <ForSignup /> }
+
 ];
 
 export default routes;
