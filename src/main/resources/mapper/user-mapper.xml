@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 해당 파일에 모든 쿼리문을 작성 -->
+<mapper namespace="userMapper">
+
+    <resultMap id="userAccount" type="com.bom.shop.user.vo.UserAccountVO">
+        <id     column="USER_ID"    property="userId"/>
+        <result column="USER_PW"    property="userPw"/>
+        <result column="USER_ROLE"  property="userRole"/>
+        <result column="REGISTRATION_ID" property="registrationId"/>
+        <result column="CREATED_AT" property="createdAt"/>
+        <result column="UPDATED_AT" property="updatedAt"/>
+        <association property="userProfileVO" resultMap="userProfile"/>
+        <collection property="userAddrVO" resultMap="userAddr"/>
+    </resultMap>
+
+    <resultMap id="userProfile" type="com.bom.shop.user.vo.UserProfileVO">
+        <id     column="USER_ID"    property="userId"/>
+        <result column="USER_NAME"  property="userName"/>
+        <result column="GENDER"     property="gender"/>
+        <result column="EMAIL"      property="email"/>
+        <result column="USER_TEL"   property="userTel"/>
+        <result column="BIRTH_DATE" property="birthDate"/>
+        <result column="JOIN_DATE"  property="joinDate"/>
+        <result column="CREATED_AT" property="createdAt"/>
+        <result column="UPDATED_AT" property="updatedAt"/>
+    </resultMap>
+
+    <resultMap id="userAddr" type="com.bom.shop.user.vo.UserAddrVO">
+        <id     column="ADDR_CODE"      property="addrCode"/>
+        <result column="ADDR"           property="addr"/>
+        <result column="ADDR_DETAIL"    property="addrDetail"/>
+        <result column="POST_CODE"      property="postCode"/>
+        <result column="IS_DEFAULT"     property="isDefault"/>
+        <result column="USER_ID"        property="userId"/>
+        <result column="CREATED_AT"     property="createdAt"/>
+        <result column="UPDATED_AT"     property="updatedAt"/>
+    </resultMap>
+
+    <!-- for로 한번에 데이터를 다 삽입 할 건지, 아니면 각자 삽입 쿼리를 만들건지 -->
+    <!-- for문으로 한번에 : 한번에 처리해서 빠름. 하지만 트랜지션을 걸 수가 없어서 버그 나면 내 수준에서 힘들 거 같음. -->
+    <!-- 삽입 쿼리 3개 : 조금 귀찮고 위보다는 느림. 하지만 트랜지션을 걸 수 있어서 안정성이 높음 -->
+    <!-- 결론 : 삽입 쿼리를 3개 만들자! -->
+
+    <!-- 기본 회원가입 insert -->
+    <insert id="userSignInsert1">
+        INSERT INTO USER_ACCOUNT (
+        USER_ID
+        , USER_PW
+        , USER_ROLE
+        , CREATED_AT
+        , UPDATED_AT
+        ) VALUES (
+        #{userId}
+        , #{userPw}
+        , #{userRole}
+        , NOW()
+        , NOW()
+        )
+    </insert>
+
+    <insert id="userSignInsert2">
+        INSERT INTO USER_PROFILE (
+            USER_ID
+            , USER_NAME
+            , GENDER
+            , EMAIL
+            , USER_TEL
+            , BIRTH_DATE
+            , JOIN_DATE
+            , CREATED_AT
+            , UPDATED_AT
+        ) VALUES (
+            #{userId}
+            , #{userName}
+            , #{gender}
+            , #{email}
+            , #{userTel}
+            , #{birthDate}
+            , NOW()
+            , NOW()
+            , NOW()
+        )
+    </insert>
+
+    <insert id="userSignInsert3">
+        INSERT INTO USER_ADDR (
+            ADDR
+            , ADDR_DETAIL
+            , POST_CODE
+            , IS_DEFAULT
+            , USER_ID
+            , CREATED_AT
+            , UPDATED_AT
+        ) VALUES (
+            #{addr}
+            , #{addrDetail}
+            , #{postCode}
+            , #{isDefault}
+            , #{userId}
+            , NOW()
+            , NOW()
+        )
+    </insert>
+
+    <!-- 중복가입 방지 -->
+    <select id="joinCheck" resultMap="userProfile">
+        SELECT
+        FROM USER_PROFILE
+        WHERE EMAIL = #{email}
+    </select>
+
+    <!-- SSO 회원가입 -->
+    <insert id="signUserWithSso1">
+        INSERT INTO USER_ACCOUNT (
+            USER_ID
+            , USER_ROLE
+            , REGISTRATION_ID
+            , CREATED_AT
+            , UPDATED_AT
+        ) VALUES(
+            #{userId}
+            , #{userRole}
+            , #{registrationId}
+            , NOW()
+            , NOW()
+        )
+    </insert>
+
+    <insert id="signUserWithSso2">
+        INSERT INTO USER_PROFILE (
+            USER_ID
+            , USER_NAME
+            , GENDER
+            , EMAIL
+            , USER_TEL
+            , BIRTH_DATE
+            , JOIN_DATE
+            , CREATED_AT
+            , UPDATED_AT
+        ) VALUES(
+            #{userId}
+            , #{userName}
+            , #{gender}
+            , #{email}
+            , #{userTel}
+            , #{birthDate}
+            , NOW()
+            , NOW()
+            , NOW()
+        )
+    </insert>
+
+    <!-- sso 로그인 -->
+    <select id="ssoLoginSelect" resultMap="userAccount">
+        SELECT UA.USER_ID
+            , EMAIL
+            , USER_ROLE
+            , REGISTRATION_ID
+        FROM USER_ACCOUNT UA
+        JOIN USER_PROFILE UP
+        ON UA.USER_ID = UP.USER_ID
+        WHERE UP.EMAIL = #{email}
+        AND UA.REGISTRATION_ID = #{registrationId}
+    </select>
+
+    <!-- 일반 로그인 -->
+    <select id="normalLoginSelect" resultMap="userAccount">
+        SELECT UA.USER_ID
+            , USER_ROLE
+            , USER_NAME
+        FORM USER_ACCOUNT UA
+        JOIN USER_PROFILE UP
+        ON UA.USER_ID = UP.USER_ID
+        WHERE UA.USER_ID = #{userId}
+    </select>
+    <!-- refresh 토큰 용 유저 역할 조회 -->
+    <select id="getRolesByEmail" resultType="String">
+        SELECT USER_ROLE
+        FROM USER_PROFILE
+        WHERE EMAIL = #{email}
+    </select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
