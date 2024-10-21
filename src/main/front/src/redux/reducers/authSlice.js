@@ -5,9 +5,10 @@ const initialState = {
     , user: null
     , error: null
     , isNewUser: false
-    , registrationData: null
+    , registrationId: null
     , accessToken: null
     , refreshToken: null
+    , isSSO: false
 };
 
 const authSlice = createSlice({
@@ -31,19 +32,19 @@ const authSlice = createSlice({
             state.isNewUser = false;
             state.registrationId = null;
         }
-        , setRegistrationData: (state, action) => {
+        , setRegistrationId: (state, action) => {
             state.isLoggedIn = true;
-            state.registrationData = action.payload;
+            state.registrationId = action.payload;
         }
-        , clearRegistrationData: (state) => {
+        , clearRegistrationId: (state) => {
             state.isNewUser = false;
-            state.registrationData = null;
+            state.registrationId = null;
         }
         , registrationSuccess: (state, action) => {
             state.isLoggedIn = true;
             state.user = action.payload;
             state.isNewUser = false;
-            state.registrationData = null;
+            state.registrationId = null;
             state.error = null;
         }
         , registrationFailure: (state, action) => {
@@ -55,7 +56,11 @@ const authSlice = createSlice({
         }
         , setUser: (state, action) => {
             state.user = action.payload;
-            state.isNewUser = action.payload.isNewUser;
+            state.isNewUser = action.payload.isNewUser || false;
+            state.isSSO = !!action.payload.registrationId;
+            if(action.payload.registrationId){
+                state.registrationId = action.payload.registrationId;
+            }
         }
     }
 })

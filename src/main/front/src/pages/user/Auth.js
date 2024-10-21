@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const Auth = ({ className = '' }) => {
     const navigate = useNavigate();
-    const [signupType, setsignupType] = useState('domestic');
+    const [signupType, setSignupType] = useState('domestic');
 
     return(
         <div>
@@ -21,7 +21,7 @@ const Auth = ({ className = '' }) => {
                             ? 'border-blue-500 text-blue-500'
                             : 'border-gray-300 text-gray-500 hover:border-blue-300 hover:text-blue-300'
                         }`}
-                        onClick={() => setsignupType('domestic')}>
+                        onClick={() => setSignupType('domestic')}>
                         국내 회원
                     </button>
                     <button 
@@ -30,7 +30,7 @@ const Auth = ({ className = '' }) => {
                             ? 'border-blue-500 text-blue-500'
                             : 'border-gray-300 text-gray-500 hover:border-blue-300 hover:text-blue-300'
                         }`}
-                        onClick={() => setsignupType('foreign')}>
+                        onClick={() => setSignupType('foreign')}>
                         해외 회원
                     </button>
                 </div>

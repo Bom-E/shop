@@ -20,7 +20,7 @@ const DomSignup = () => {
         , userId: ''
         , registrationId: ''
     });
-    const [ isSSO, setIsSSO ] = useState(false); 
+    const [ isSignupSSO, setIsSignupSSO ] = useState(false); 
     const [ pwConfirm, setPwConfirm ] = useState('');
 
     const user = useSelector(state => state.auth.user);
@@ -32,7 +32,7 @@ const DomSignup = () => {
             return false;
         }
 
-        if(!isSSO){
+        if(!isSignupSSO){
             if(!formData.userPw || !pwConfirm){
                 setError("비밀번호를 입력해주세요.");
                 return false;
@@ -44,7 +44,7 @@ const DomSignup = () => {
         }
 
         return true;
-    }
+    };
 
     useEffect(() => {
         const isPath = location.pathname.includes('domSignup');
@@ -63,8 +63,11 @@ const DomSignup = () => {
                     , email
                     , registrationId
                 }));
-                setIsSSO(true);
+                setIsSignupSSO(true);
                 dispatch(setUser({ email, registrationId, isNewUser }));
+            } else {
+                setIsSignupSSO(false)
+                dispatch(setUser({ isNewUser: true }));
             }
         } 
     }, [location, dispatch]);
@@ -97,7 +100,7 @@ const DomSignup = () => {
         try {
             const dataSubmit = {...formData};
 
-            if(isSSO){
+            if(isSignupSSO){
                 delete dataSubmit.userPw;
             }
 
@@ -127,7 +130,7 @@ const DomSignup = () => {
 
     return(
         <form onSubmit={handleSubmit} className="flex flex-col items-center">
-            <div>{isSSO ? 'SNS 간편가입' : '일반 회원가입'}</div>
+            <div>{isSignupSSO ? 'SNS 간편가입' : '일반 회원가입'}</div>
             <hr className="w-full my-4"></hr>
             <div>
                 <span>아이디 </span>
@@ -137,7 +140,7 @@ const DomSignup = () => {
                 <input name="userId" value={formData.userId} onChange={handleOnChange} placeholder="아이디를 입력해 주세요" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
             </div>
 
-            {!isSSO && (
+            {!isSignupSSO && (
                 <>
                     <div>
                         <span>비밀번호 </span>
@@ -177,7 +180,7 @@ const DomSignup = () => {
             </div>
             <div>
                 <span>
-                    <input name="email" value={formData.email} onChange={handleOnChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" readOnly={isSSO} placeholder={formData.email || '이메일을 입력해 주세요.'}/></span>
+                    <input name="email" value={formData.email} onChange={handleOnChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" readOnly={isSignupSSO} placeholder={formData.email || '이메일을 입력해 주세요.'}/></span>
             </div>
             <div>
                 <span>생년월일/성별 </span>
