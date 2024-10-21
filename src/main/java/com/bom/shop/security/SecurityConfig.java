@@ -3,6 +3,7 @@ package com.bom.shop.security;
 import com.bom.shop.security.jwtFacadePattern.JwtService;
 import com.bom.shop.security.jwtFacadePattern.JwtServiceFactory;
 import com.bom.shop.user.service.UserSignService;
+import com.bom.shop.utility.CookieUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
@@ -25,23 +26,21 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final JwtServiceFactory jwtServiceFactory;
-//    private final TokenAuthenticationSuccessHandler tokenAuthenticationSuccessHandler;
-//    private final TokenAuthenticationFailureHandler tokenAuthenticationFailureHandler;
     private final ObjectMapper objectMapper;
     private final UserSignService userSignService;
+    private final CookieUtil cookieUtil;
 
-    public SecurityConfig(JwtServiceFactory jwtServiceFactory, ObjectMapper objectMapper, UserSignService userSignService){
+    public SecurityConfig(JwtServiceFactory jwtServiceFactory, ObjectMapper objectMapper, UserSignService userSignService, CookieUtil cookieUtil){
         this.jwtServiceFactory = jwtServiceFactory;
-//        this.tokenAuthenticationSuccessHandler = tokenAuthenticationSuccessHandler;
-//        this.tokenAuthenticationFailureHandler = tokenAuthenticationFailureHandler;
         this.objectMapper = objectMapper;
         this.userSignService = userSignService;
+        this.cookieUtil = cookieUtil;
     }
 
     @Bean
     public TokenAuthenticationSuccessHandler tokenAuthenticationSuccessHandler(){
         JwtService jwtService = jwtServiceFactory.createJwtService();
-        return new TokenAuthenticationSuccessHandler(jwtService, objectMapper, userSignService);
+        return new TokenAuthenticationSuccessHandler(jwtService, objectMapper, userSignService, cookieUtil);
     }
 
     @Bean

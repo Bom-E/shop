@@ -4,12 +4,20 @@ import com.bom.shop.security.jwtFacadePattern.JwtService;
 import com.bom.shop.user.service.UserSignService;
 import com.bom.shop.user.vo.UserAccountVO;
 import com.bom.shop.user.vo.UserProfileVO;
+import com.bom.shop.utility.CookieUtil;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,23 +31,20 @@ public class UserSignController {
     JwtService jwtService;
     @Resource(name = "userSignService")
     UserSignService userSignService;
+    @Resource(name = "cookieUtil")
+    CookieUtil cookieUtil;
 
     // 로그인
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> getSsoLoginUrls(@RequestParam(name = "email", required = false) String email
                                             , @RequestParam(name = "registrationId", required = false)String registrationId
-                                            , @RequestParam(name = "userId", required = false) String userId){
+                                            , @RequestParam(name = "userId", required = false) String userId
+                                            , HttpServletResponse response){
 
-//        if(isNormalLogin(email, registrationId, userId)){
-//            return handleNormalLogin(userId);
-//        } else if(isSsoLogin(email, registrationId)){
-//            return handleSsoLogin(email, registrationId);
-//        } else {
-//            return ResponseEntity.badRequest().body("Invalid parameters");
-//        }
-
+        // 일반 로그인
         if(email == null && registrationId == null){
             UserAccountVO userAccountVO = userSignService.normalLoginSelect(userId);
+            // 존재하는 유저
             if(userAccountVO != null){
 
                 return ResponseEntity.ok().body(Map.of(
@@ -48,6 +53,7 @@ public class UserSignController {
                         , "userId", userAccountVO.getUserId()
                         , "userRole", userAccountVO.getUserRole()
                         , "userName", userAccountVO.getUserProfileVO().getUserName()));
+                // 이 부분 클라이언트로 넘겨 줄 생각 없음 없애도 될 듯
             } else {
                 Map<String, String> signupInfo = new HashMap<>();
                 signupInfo.put("status", "signup");
@@ -63,7 +69,20 @@ public class UserSignController {
 
         UserAccountVO userAccountVO = userSignService.ssoLoginSelect(params);
 
+        // 소셜 로그인
         if(userAccountVO != null){
+            List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + userAccountVO.getUserRole()));
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    userAccountVO.getUserId()
+                    , null
+                    , authorities
+            );
+
+            String accessToken = jwtService.generateAccessToken(authentication);
+            String refreshToken = jwtService.generateRefreshToken(authentication);
+
+            cookieUtil.addTokenCookie(response, "accessToken", accessToken);
+            cookieUtil.addTokenCookie(response, "refreshToken", refreshToken);
 
             return ResponseEntity.ok().body(Map.of(
                     "status", "login"

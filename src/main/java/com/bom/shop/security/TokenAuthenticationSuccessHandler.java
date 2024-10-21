@@ -3,6 +3,7 @@ package com.bom.shop.security;
 import com.bom.shop.security.jwtFacadePattern.JwtService;
 import com.bom.shop.user.service.UserSignService;
 import com.bom.shop.user.vo.UserAccountVO;
+import com.bom.shop.utility.CookieUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -26,11 +27,13 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
     private final JwtService jwtService;
     private final ObjectMapper objectMapper;
     private final UserSignService userSignService;
+    private final CookieUtil cookieUtil;
 
-    public TokenAuthenticationSuccessHandler(JwtService jwtService, ObjectMapper objectMapper, UserSignService userSignService){
+    public TokenAuthenticationSuccessHandler(JwtService jwtService, ObjectMapper objectMapper, UserSignService userSignService, CookieUtil cookieUtil){
         this.jwtService = jwtService;
         this.objectMapper = objectMapper;
         this.userSignService = userSignService;
+        this.cookieUtil = cookieUtil;
     }
 
     @Override
@@ -38,8 +41,8 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
         String accessToken = jwtService.generateAccessToken(authentication);
         String refreshToken = jwtService.generateRefreshToken(authentication);
 
-        addTokenCookie(response, "access_token", accessToken);
-        addTokenCookie(response, "refresh_token", refreshToken);
+        cookieUtil.addTokenCookie(response, "access_token", accessToken);
+        cookieUtil.addTokenCookie(response, "refresh_token", refreshToken);
 
         if(authentication instanceof OAuth2AuthenticationToken){
             OAuth2AuthenticationToken oauth2Token = (OAuth2AuthenticationToken) authentication;
@@ -95,15 +98,6 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
             default:
                 throw new IllegalArgumentException("Unsupported registrationId: " + registrationId);
         }
-    }
-
-    private void addTokenCookie(HttpServletResponse response, String name, String value){
-        Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(3600);
-        response.addCookie(cookie);
     }
 
 }
