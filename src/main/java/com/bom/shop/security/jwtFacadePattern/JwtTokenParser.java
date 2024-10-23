@@ -1,12 +1,10 @@
 package com.bom.shop.security.jwtFacadePattern;
 
-import com.bom.shop.user.service.UserSignService;
 import com.bom.shop.user.vo.UserProfileVO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service("jwtTokenParser")
 public class JwtTokenParser {

@@ -29,9 +29,8 @@ const Sign1 = () => {
             if(isNewUser){
                 navigate(`/auth/sign1/domSignup?email=${email}&registrationId=${registrationId}&isNewUser=${isNewUser}`);
             } else {
-                alert('이미 회원가입 한 이메일 입니다.');
-                dispatch(loginSuccess({ email, registrationId }));
-                navigate('/');
+                alert('이미 회원가입 한 이메일 입니다. 로그인을 해주세요.');
+                navigate('/auth/login');
             }
         }
     }, [dispatch, navigate]);

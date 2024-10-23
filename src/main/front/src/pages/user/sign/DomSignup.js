@@ -74,7 +74,8 @@ const DomSignup = () => {
 
     useEffect(() => {
         if(isNewUser === false){
-            navigate('/')
+            alert('이미 회원가입한 회원입니다. 로그인을 해주세요.');
+            navigate('/auth/login')
         }
     }, [isNewUser, navigate]);
 

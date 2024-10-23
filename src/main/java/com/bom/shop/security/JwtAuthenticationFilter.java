@@ -1,8 +1,10 @@
 package com.bom.shop.security;
 
 import com.bom.shop.security.jwtFacadePattern.JwtService;
+import com.bom.shop.utility.CookieUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,9 +20,11 @@ import java.util.stream.Collectors;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final CookieUtil cookieUtil;
 
-    public JwtAuthenticationFilter(JwtService jwtService){
+    public JwtAuthenticationFilter(JwtService jwtService, CookieUtil cookieUtil){
         this.jwtService = jwtService;
+        this.cookieUtil = cookieUtil;
     }
 
     @Override
@@ -40,12 +44,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String extractJwtFromRequest(HttpServletRequest request){
+        // 헤더 체크
         String bearerToken = request.getHeader("Authorization");
         if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")){
             return bearerToken.substring(7);
         }
-        return null;
+
+        // 쿠키 체크
+        // 리프레시 토큰 확인 필요 없는 이유: 별도의 엔드 포인트에서(보통 컨트롤러) 확인 함.
+        return cookieUtil.extractTokenFromCookies(
+                request.getCookies(),
+                CookieUtil.ACCESS_TOKEN
+        );
     }
+
 }
 
 

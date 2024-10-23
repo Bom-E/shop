@@ -1,8 +1,5 @@
 package com.bom.shop.security;
 
-import com.bom.shop.user.service.UserSignService;
-import com.bom.shop.user.vo.UserAccountVO;
-import com.bom.shop.user.vo.UserProfileVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,9 +33,9 @@ public class TokenAuthenticationFailureHandler implements AuthenticationFailureH
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (authentication instanceof OAuth2AuthenticationToken) {
-                OAuth2AuthenticationToken oAuth2Token = (OAuth2AuthenticationToken) authentication;
-                OAuth2User oAuth2User = oAuth2Token.getPrincipal();
-                String registrationId = oAuth2Token.getAuthorizedClientRegistrationId();
+                OAuth2AuthenticationToken oauth2Token = (OAuth2AuthenticationToken) authentication;
+                OAuth2User oAuth2User = oauth2Token.getPrincipal();
+                String registrationId = oauth2Token.getAuthorizedClientRegistrationId();
                 String email = extractEmail(oAuth2User, registrationId);
 
                 if ("User not found".equals(exception.getMessage())) {

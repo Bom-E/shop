@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("userSignService")
-public class UserSignServiceImpl implements UserSignService {
+public class UserAuthServiceImpl implements UserAuthService {
 
     @Autowired
     private SqlSessionTemplate sqlSession;

@@ -1,28 +1,18 @@
 package com.bom.shop.security.jwtFacadePattern;
 
-import com.bom.shop.user.service.UserSignService;
-import com.bom.shop.user.vo.UserProfileVO;
+import com.bom.shop.user.service.UserAuthService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+
 import static org.junit.jupiter.api.Assertions.*;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mybatis.spring.SqlSessionTemplate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.stereotype.Service;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -31,9 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class JwtTokenParserTest {
@@ -46,7 +34,7 @@ public class JwtTokenParserTest {
     private JwtTokenValidator jwtTokenValidator;
 
     @Autowired
-    private UserSignService userSignService;
+    private UserAuthService userAuthService;
 
     @Autowired
     private JwtTokenParser jwtTokenParser;

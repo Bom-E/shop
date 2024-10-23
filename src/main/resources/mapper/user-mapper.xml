@@ -175,7 +175,8 @@
         ON UA.USER_ID = UP.USER_ID
         WHERE UA.USER_ID = #{userId}
     </select>
-    <!-- refresh 토큰 용 유저 역할 조회 -->
+
+    <!-- refresh 토큰 용 유저 역할 조회(sso 때문에 조건문에 이메일을 넣었는데 더 생각해보기.) -->
     <select id="getRolesByEmail" resultType="String">
         SELECT USER_ROLE
         FROM USER_PROFILE

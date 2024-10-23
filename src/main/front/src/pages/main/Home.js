@@ -1,13 +1,10 @@
-import GridSlider from "../components/common/GridSlider";
+import GridSlider from "../../components/common/GridSlider";
 import { ChevronRight } from 'lucide-react';
 import toYou from '../assets/toYou.png';
 import you from '../assets/you.png';
 import middleEvent from '../assets/middleEvent.png';
 
 const Home = () => {
- 
-
-    
 
     return(
     <div>
