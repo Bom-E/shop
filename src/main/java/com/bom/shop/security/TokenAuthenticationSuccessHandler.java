@@ -148,7 +148,7 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
     }
 
     private void redirectToOAuth2Signup(String email, String registrationId, HttpServletResponse response) throws IOException{
-        String targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_URL + "/auth/sign1/donSignup")
+        String targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_URL + "/auth/sign1/ssoSignup")
                 .queryParam("email", email)
                 .queryParam("registrationId", registrationId)
                 .queryParam("isNewUser", "true")
@@ -157,7 +157,7 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
     }
 
     private void redirectToSignup(HttpServletResponse response) throws IOException{
-        String targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_URL + "/auth/sign1/domSignup")
+        String targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_URL + "/auth/sign1/defaultSignup")
                 .build().toUriString();
         response.sendRedirect(targetUrl);
     }

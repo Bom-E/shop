@@ -8,6 +8,7 @@ import com.bom.shop.utility.AuthenticationUtil;
 import com.bom.shop.utility.CookieUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.logging.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -30,13 +31,15 @@ public class UserAuthController {
     AuthenticationUtil authenticationUtil;
 
     // 일반 로그인
-    @PostMapping("/login")
-    public ResponseEntity<?> defaultLogin(@RequestParam(name = "userId", required = false) String userId
+    @PostMapping("/login/defaultLogin")
+    public ResponseEntity<?> defaultLogin(@RequestBody Map<String, Object> loginData
                                             , HttpServletResponse response) {
         try {
 
+            System.out.println(loginData);
+
             // 일반 로그인
-            UserAccountVO userAccountVO = userAuthService.normalLoginSelect(userId);
+            UserAccountVO userAccountVO = userAuthService.normalLoginSelect((String) loginData.get("userId"));
             // 존재하는 유저
             if (userAccountVO != null) {
 
@@ -68,7 +71,7 @@ public class UserAuthController {
     }
 
     // 소셜 로그인
-    @PostMapping("/socialLogin")
+    @PostMapping("/login/socialLogin")
     public ResponseEntity<?> socialLogin(@RequestParam(name = "email", required = false) String email
                                         , @RequestParam(name = "registrationId", required = false)String registrationId
                                         , HttpServletResponse response) {

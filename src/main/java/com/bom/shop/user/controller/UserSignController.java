@@ -17,66 +17,93 @@ import java.util.Map;
 @CrossOrigin(origins = "http://localhost:3000")
 public class UserSignController {
 
-    @Resource(name = "jwtService")
-    JwtService jwtService;
     @Resource(name = "userSignService")
     UserSignService userSignService;
 
-    // 회원가입 추후 리펙토링으로 일반 회원가입과 오어서 회원가입 분리하기
-    @PostMapping("/sign1/domSignup")
-    public ResponseEntity<?> userSignSso(@RequestBody Map<String, Object> signupData
-            , @CookieValue("access_token") String accessToken){
-
-        if(!jwtService.validateToken(accessToken, false)){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+    // 일반 회원가입
+    @PostMapping("/sign1/defaultSignup")
+    public ResponseEntity<?> userSignSso(@RequestBody Map<String, Object> signupData){
 
         try {
-            UserAccountVO userAccountVO = new UserAccountVO();
-            UserProfileVO userProfileVO = new UserProfileVO();
+            validateDefaultSignupData(signupData);
 
-            String userId = (String) signupData.get("userId");
-            String registrationId = (String) signupData.get("registrationId");
-            String userPw = (String) signupData.get("userPw");
+            UserAccountVO userAccountVO = createDefaultUserAccount(signupData);
+            UserProfileVO userProfileVO = createUserProfile(signupData);
 
-            System.out.println("@@@@@@@@@@@@@@@@@registrationId=" + registrationId);
-            System.out.println("@@@@@@@@@@@@@@@@@userPw=" + userPw);
-
-            userAccountVO.setUserId(userId);
-            userAccountVO.setUserRole("USER");
-
-            userProfileVO.setUserId(userId);
-            userProfileVO.setUserName((String) signupData.get("userName"));
-            userProfileVO.setGender((String) signupData.get("gender"));
-            userProfileVO.setEmail((String) signupData.get("email"));
-            userProfileVO.setUserTel((String) signupData.get("userTel"));
-            userProfileVO.setBirthDate((String) signupData.get("birthDate"));
-
-            if(registrationId != null && !registrationId.isEmpty()){
-
-                // sso 회원가입
-                if(accessToken == null || !jwtService.validateToken(accessToken, false)){
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-                }
-
-                userAccountVO.setRegistrationId(registrationId);
-                userSignService.userSignSso(userAccountVO, userProfileVO);
-
-                // 일반 회원가입
-            } else if(userPw != null && !userPw.isEmpty()){
-
-                userAccountVO.setUserPw(userPw);
-                userSignService.userSignNormal(userAccountVO, userProfileVO);
-
-            } else {
-                return ResponseEntity.badRequest().body(Map.of("error", "Invalid signup data"));
-            }
+            userSignService.defaultUserSign(userAccountVO, userProfileVO);
 
             return ResponseEntity.ok().body(Map.of("message", "Signup successful"));
+
         } catch (Exception e) {
-            String errorMessage = e.getMessage() != null ? e.getMessage() : "An unknown error occurred";
-            return ResponseEntity.badRequest().body(Map.of("error", errorMessage));
+            return handleSignupError(e);
         }
 
+    }
+
+    // 오어서2 회원가입
+    @PostMapping("/sign1/ssoSignup")
+    public ResponseEntity<?> oauth2Signup(@RequestBody Map<String, Object> signupData){
+
+        try {
+            validateOAuth2SighupData(signupData);
+
+            UserAccountVO userAccountVO = createOAuth2UserAccount(signupData);
+            UserProfileVO userProfileVO = createUserProfile(signupData);
+
+            userSignService.ssoUserSign(userAccountVO, userProfileVO);
+
+            return ResponseEntity.ok().body(Map.of("message", "Signup successful"));
+
+        } catch (Exception e) {
+            return handleSignupError(e);
+        }
+    }
+
+    private UserAccountVO createOAuth2UserAccount(Map<String, Object> signupData){
+        UserAccountVO userAccountVO = new UserAccountVO();
+        userAccountVO.setUserId((String) signupData.get("userId"));
+        userAccountVO.setRegistrationId((String) signupData.get("registrationId"));
+        userAccountVO.setUserRole("USER");
+
+        return userAccountVO;
+    }
+
+    private UserAccountVO createDefaultUserAccount(Map<String, Object> signupData){
+        UserAccountVO userAccountVO = new UserAccountVO();
+        userAccountVO.setUserId((String) signupData.get("userId"));
+        userAccountVO.setUserPw((String) signupData.get("userPw"));
+        userAccountVO.setUserRole("USER");
+
+        return userAccountVO;
+    }
+
+    private UserProfileVO createUserProfile(Map<String, Object> signupData){
+        UserProfileVO userProfileVO = new UserProfileVO();
+        userProfileVO.setUserId((String)signupData.get("userId"));
+        userProfileVO.setUserName((String)signupData.get("userName"));
+        userProfileVO.setGender((String)signupData.get("gender"));
+        userProfileVO.setEmail((String)signupData.get("email"));
+        userProfileVO.setUserTel((String)signupData.get("userTel"));
+        userProfileVO.setBirthDate((String)signupData.get("birthDate"));
+
+        return userProfileVO;
+    }
+
+    private void validateOAuth2SighupData(Map<String, Object> signupData){
+        if(signupData.get("registrationId") == null){
+            throw new IllegalArgumentException("Registration ID is required for OAuth2 signup");
+        }
+    }
+
+    private void validateDefaultSignupData(Map<String, Object> signupData){
+        String userPw = (String) signupData.get("userPw");
+        if(userPw == null || userPw.trim().isEmpty()){
+            throw new IllegalArgumentException("Password is required for normal signup");
+        }
+    }
+
+    private ResponseEntity<?> handleSignupError(Exception e){
+        String errorMessage = e.getMessage() != null ? e.getMessage() : "An unknown error occurred";
+        return ResponseEntity.badRequest().body(Map.of("error", errorMessage));
     }
 }

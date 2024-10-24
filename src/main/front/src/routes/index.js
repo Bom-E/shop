@@ -39,8 +39,9 @@ const routes = [
         ]
     }
     , { path: 'auth/login', element: <LoginPage /> }
-    , { path: 'auth/sign1/domSignup', element: <DomSignup /> }
-    , { path: 'auth/sign1/signup', element: <DomSignup /> }
+    , { path: 'auth/login/socialLogin', element: <LoginPage /> }
+    , { path: 'auth/sign1/defaultSignup', element: <DomSignup /> }
+    , { path: 'auth/sign1/ssoSignup', element: <DomSignup /> }
     , { path: 'auth/sign2/forSignup', element: <ForSignup /> }
 
 ];

@@ -45,11 +45,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
     public TokenAuthenticationSuccessHandler tokenAuthenticationSuccessHandler(){
         JwtService jwtService = jwtServiceFactory.createJwtService();
         return new TokenAuthenticationSuccessHandler(jwtService, objectMapper, userAuthService, cookieUtil, authenticationUtil);

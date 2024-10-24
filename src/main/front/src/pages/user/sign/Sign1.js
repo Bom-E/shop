@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { loginSuccess, setUser } from "../../../redux/reducers/authSlice";
+import { setUser } from "../../../redux/reducers/authSlice";
 
 const Sign1 = () => {
     const navigate = useNavigate();
@@ -27,7 +27,7 @@ const Sign1 = () => {
             }));
 
             if(isNewUser){
-                navigate(`/auth/sign1/domSignup?email=${email}&registrationId=${registrationId}&isNewUser=${isNewUser}`);
+                navigate(`/auth/sign1/ssoSignup?email=${email}&registrationId=${registrationId}&isNewUser=${isNewUser}`);
             } else {
                 alert('이미 회원가입 한 이메일 입니다. 로그인을 해주세요.');
                 navigate('/auth/login');
@@ -55,7 +55,7 @@ const Sign1 = () => {
     };
 
     const handleNormalSignup = () => {
-        navigate('/auth/sign1/signup');
+        navigate('/auth/sign1/defaultSignup');
     }
 
     return(

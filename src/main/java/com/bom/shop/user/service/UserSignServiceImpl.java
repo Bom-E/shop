@@ -24,7 +24,7 @@ public class UserSignServiceImpl implements UserSignService{
     // sso 회원가입
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void userSignSso(UserAccountVO userAccountVO, UserProfileVO userProfileVO) {
+    public void ssoUserSign(UserAccountVO userAccountVO, UserProfileVO userProfileVO) {
         sqlSession.insert("userMapper.signUserWithSso1", userAccountVO);
         sqlSession.insert("userMapper.signUserWithSso2", userProfileVO);
     }
@@ -32,7 +32,7 @@ public class UserSignServiceImpl implements UserSignService{
     // 일반 회원가입
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void userSignNormal(UserAccountVO userAccountVO, UserProfileVO userProfileVO) {
+    public void defaultUserSign(UserAccountVO userAccountVO, UserProfileVO userProfileVO) {
         String securityPw = passwordEncoder.encode(userAccountVO.getUserPw());
         userAccountVO.setUserPw(securityPw);
 

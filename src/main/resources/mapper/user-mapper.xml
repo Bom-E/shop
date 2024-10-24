@@ -166,7 +166,7 @@
     </select>
 
     <!-- 일반 로그인 -->
-    <select id="normalLoginSelect" resultMap="userAccount">
+    <select id="defaultLoginSelect" resultMap="userAccount">
         SELECT UA.USER_ID
             , USER_ROLE
             , USER_NAME

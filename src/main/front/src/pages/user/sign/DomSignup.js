@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { setUser } from "../../../redux/reducers/authSlice";
+import { selectUser, setUser } from "../../../redux/reducers/authSlice";
 import api from "../../../api/index";
 
 const DomSignup = () => {
@@ -23,7 +23,7 @@ const DomSignup = () => {
     const [ isSignupSSO, setIsSignupSSO ] = useState(false); 
     const [ pwConfirm, setPwConfirm ] = useState('');
 
-    const user = useSelector(state => state.auth.user);
+    const user = useSelector(selectUser);
     const isNewUser = user ? user.isNewUser : null;
 
     const dataCheck = () => {
@@ -47,7 +47,7 @@ const DomSignup = () => {
     };
 
     useEffect(() => {
-        const isPath = location.pathname.includes('domSignup');
+        const isPath = location.pathname.includes('ssoSignup');
 
         if(isPath){
             const params = new URLSearchParams(location.search);
@@ -97,21 +97,23 @@ const DomSignup = () => {
         }
 
         setIsLoading(true);
+        const dataSubmit = {...formData};
 
         try {
-            const dataSubmit = {...formData};
 
-            if(isSignupSSO){
-                delete dataSubmit.userPw;
-            }
+            const response = await api.post(
+                isSignupSSO ? '/auth/sign1/ssoSignup' : '/auth/sign1/defaultSignup'
+                , isSignupSSO ? { ...dataSubmit, userPw: undefined } : dataSubmit
+            );
 
-            const response = await api.post('/auth/sign1/domSignup', dataSubmit);
             if(response.data.message === "Signup successful"){
                 alert('가입되었습니다.');
                 navigate('/');
             } else {
+                alert('회원가입 중 오류가 발생했습니다.');
                 setError("회원가입 처리 중 오류가 발생했습니다. 다시 시도해 주세요.");
             }
+            
         } catch (error) {
             console.log('Signup failed:', error);
             setError(error.response?.data?.message || "회원가입 처리 중 오류가 발생했습니다.");

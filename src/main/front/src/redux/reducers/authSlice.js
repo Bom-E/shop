@@ -19,13 +19,13 @@ const authSlice = createSlice({
             state.isLoggedIn = true;
             state.user = action.payload;
             state.error = null;
-        },
-        loginFailure: (state, action) => {
+        }
+        , loginFailure: (state, action) => {
             state.isLoggedIn = false;
             state.user = null;
             state.error = action.payload;
-        },
-        logout: (state) => {
+        }
+        , logout: (state) => {
             state.isLoggedIn = false;
             state.user = null;
             state.error = null;
@@ -76,5 +76,15 @@ export const {
     , setTokens
     , setUser
 } = authSlice.actions;
+
+export const selectAuth = (state) => state.auth;
+export const selectUser = (state) => state.auth.user;
+export const selectIsLoggedIn = (state) => state.auth.isLoggedIn;
+export const selectError = (state) => state.auth.error;
+export const selectIsSSO = (state) => state.auth.isSSO;
+export const selectToken = (state) => ({
+    accessToken: state.auth.accessToken
+    , refreshToken: state.auth.refreshToken
+}); 
 
 export default authSlice.reducer;
