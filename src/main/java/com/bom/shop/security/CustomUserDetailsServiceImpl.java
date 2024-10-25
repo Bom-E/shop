@@ -63,14 +63,17 @@ public class CustomUserDetailsServiceImpl extends DefaultOAuth2UserService imple
     // 일반
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserAccountVO userAccountVO = userAuthService.normalLoginSelect(username);
+        UserAccountVO userAccountVO = new UserAccountVO();
+        userAccountVO.setUserId(username);
 
-        if(userAccountVO == null){
+        UserAccountVO user = userAuthService.playLoginDataCheck(userAccountVO);
+
+        if(user == null){
             throw new UsernameNotFoundException("User not found with userId: " + username);
         }
         return User.builder()
-                .username(userAccountVO.getUserId())
-                .password(userAccountVO.getUserPw())
+                .username(user.getUserId())
+                .password(user.getUserPw())
                 .authorities(Collections.singletonList(
                         new SimpleGrantedAuthority("ROLE_" + userAccountVO.getUserRole())))
                 .accountExpired(false)

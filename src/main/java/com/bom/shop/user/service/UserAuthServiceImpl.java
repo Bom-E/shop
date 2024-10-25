@@ -32,8 +32,23 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
-    public UserAccountVO normalLoginSelect(String userId) {
-        return sqlSession.selectOne("userMapper.normalLoginSelect", userId);
+    public UserAccountVO defaultLoginSelect(UserAccountVO loginData) {
+        UserAccountVO checkData = sqlSession.selectOne("userMapper.playLoginDataCheck", loginData.getUserId());
+
+        if(checkData != null && passwordEncoder.matches(loginData.getUserPw(), checkData.getUserPw())){
+            System.out.println("Input PW :" + loginData.getUserPw());
+            System.out.println("Stored Pw : " + checkData.getUserPw());
+            System.out.println("Matches :" + passwordEncoder.matches(loginData.getUserPw(), checkData.getUserPw()));
+
+            return sqlSession.selectOne("userMapper.defaultLoginSelect", loginData);
+        }
+        return null;
+    }
+
+    @Override
+    public UserAccountVO playLoginDataCheck(UserAccountVO userAccountVO) {
+
+        return sqlSession.selectOne("userMapper.playLoginDataCheck", userAccountVO);
     }
 
 

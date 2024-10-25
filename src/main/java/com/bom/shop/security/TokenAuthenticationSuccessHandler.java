@@ -88,11 +88,13 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
     }
 
     private void handleDefaultLogin(HttpServletResponse response, Authentication authentication) throws IOException{
-        String userId = authentication.getName();
-        UserAccountVO user = userAuthService.normalLoginSelect(userId);
+        UserAccountVO loginData = new UserAccountVO();
+        loginData.setUserId(authentication.getName());
+
+        UserAccountVO user = userAuthService.defaultLoginSelect(loginData);
 
         if(user != null){
-            processDefaultLogin(user, userId, response);
+            processDefaultLogin(user, user.getUserId(), response);
         } else {
             redirectToSignup(response);
         }

@@ -157,6 +157,7 @@
         SELECT UA.USER_ID
             , EMAIL
             , USER_ROLE
+            , USER_NAME
             , REGISTRATION_ID
         FROM USER_ACCOUNT UA
         JOIN USER_PROFILE UP
@@ -165,12 +166,20 @@
         AND UA.REGISTRATION_ID = #{registrationId}
     </select>
 
+    <!-- 로그인용 별도 조회 쿼리(보안) -->
+    <select id="playLoginDataCheck" resultMap="userAccount">
+        SELECT USER_ID
+            , USER_PW
+        FROM USER_ACCOUNT
+        WHERE USER_ID = #{userId}
+    </select>
+
     <!-- 일반 로그인 -->
     <select id="defaultLoginSelect" resultMap="userAccount">
         SELECT UA.USER_ID
             , USER_ROLE
             , USER_NAME
-        FORM USER_ACCOUNT UA
+        FROM USER_ACCOUNT UA
         JOIN USER_PROFILE UP
         ON UA.USER_ID = UP.USER_ID
         WHERE UA.USER_ID = #{userId}

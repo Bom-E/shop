@@ -78,6 +78,10 @@ const LoginPage = () => {
         }
     }, [tokens.accessToken]);
 
+    useEffect(() => {
+
+    }, [dispatch, navigate]);
+
     const handleSocialLogin = (socialName) => {
        
         // 인증 페이지로 리다이렉션

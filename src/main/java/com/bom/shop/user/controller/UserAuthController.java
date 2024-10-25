@@ -32,14 +32,14 @@ public class UserAuthController {
 
     // 일반 로그인
     @PostMapping("/login/defaultLogin")
-    public ResponseEntity<?> defaultLogin(@RequestBody Map<String, Object> loginData
+    public ResponseEntity<?> defaultLogin(@RequestBody UserAccountVO loginData
                                             , HttpServletResponse response) {
         try {
 
             System.out.println(loginData);
 
             // 일반 로그인
-            UserAccountVO userAccountVO = userAuthService.normalLoginSelect((String) loginData.get("userId"));
+            UserAccountVO userAccountVO = userAuthService.defaultLoginSelect(loginData);
             // 존재하는 유저
             if (userAccountVO != null) {
 
