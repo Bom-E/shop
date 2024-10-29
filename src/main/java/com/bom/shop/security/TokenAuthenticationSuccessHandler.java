@@ -103,7 +103,8 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
     private void processOAuth2Login(UserAccountVO user, String email, String registrationId, HttpServletResponse response) throws IOException{
         Authentication newAuth = authenticationUtil.createAuthentication(user);
         setAuthToken(response, newAuth);
-        sendSuccessResponse(response, createOAuth2LoginResponse(email, registrationId, user));
+//        sendSuccessResponse(response, createOAuth2LoginResponse(email, registrationId, user));
+        response.sendRedirect(FRONTEND_URL);
     }
 
     private void processDefaultLogin(UserAccountVO user, String userId, HttpServletResponse response) throws IOException{
@@ -124,6 +125,7 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
 
         responseData.put("status", "success");
         responseData.put("message", "Login Successful");
+        responseData.put("userId", user.getUserId());
         responseData.put("email", email);
         responseData.put("registrationId", registrationId);
         responseData.put("userRole", user.getUserRole());

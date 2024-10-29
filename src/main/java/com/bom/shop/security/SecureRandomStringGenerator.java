@@ -13,7 +13,7 @@ public class SecureRandomStringGenerator {
     }
 
     public static void main(String[] args) {
-        // 예시: 32바이트(256비트) 길이의 무작위 문자열 생성
+        // 32바이트(256비트) 길이의 무작위 문자열 생성
         String secretKey = generateRandomString(32);
         System.out.println("생성된 시크릿 키: " + secretKey);
         System.out.println("시크릿 키 길이: " + secretKey.length() + " 문자");

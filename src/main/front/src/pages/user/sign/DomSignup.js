@@ -50,7 +50,7 @@ const DomSignup = () => {
         const isPath = location.pathname.includes('ssoSignup');
 
         if(isPath){
-            const params = new URLSearchParams(location.search);
+            const params = new URLSearchParams(window.location.search);
             const email = params.get('email');
             const registrationId = params.get('registrationId');
             const isNewUser = params.get('isNewUser') === 'true';

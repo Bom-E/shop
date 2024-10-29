@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 해당 파일에 모든 쿼리문을 작성 -->
+<mapper namespace="tokenMapper">
+
+    <resultMap id="refreshTokenManage" type="com.bom.shop.user.vo.RefreshTokenManageVO">
+        <id     column="ID"            property="id"/>
+        <result column="USER_ID"       property="userId"/>
+        <result column="REFRESH_TOKEN" property="refreshToken"/>
+        <result column="ISSUED_AT"     property="issuedAt"/>
+        <result column="EXPIRES_AT"    property="expiresAt"/>
+    </resultMap>
+
+    <!-- 토큰 생성 -->
+    <insert id="insertRefreshToken">
+        INSERT INTO REFRESH_TOKEN_MANAGE (
+            USER_ID
+            , REFRESH_TOKEN
+            , ISSUED_AT
+            , EXPIRES_AT
+        ) VALUES (
+            #{userId}
+            , #{refreshToken}
+            , #{issuedAt}
+            , #{expiresAt}
+        )
+    </insert>
+
+    <!-- 아이디를 기반으로 리프레시 토큰 테이블 조회 -->
+    <select id="findByUserId" resultMap="refreshTokenManage">
+        SELECT *
+        FROM REFRESH_TOKEN_MANAGE
+        WHERE USER_ID = #{userId}
+    </select>
+
+    <!-- 로그아웃 시 리프레시 토큰 삭제 -->
+    <delete id="deleteByUserId">
+        DELETE REFRESH_TOKEN_MANAGE
+        WHERE USER_ID = #{userId}
+    </delete>
+
+    <!-- 리프레시 토큰 만료 후 자동 로그아웃 -->
+    <delete id="deleteExpiredTokens">
+        DELETE REFRESH_TOKEN_MANAGE
+        WHERE EXPIRED_AT &lt; NOW()
+    </delete>
+
+    <!-- 토큰 유효성 검증 -->
+    <select id="validateToken" resultType="boolean">
+        SELECT COUNT(*)
+        FROM REFRESH_TOKEN_MANAGE
+        WHERE USER_ID = #{userId}
+        AND REFRESH_TOKEN = #{refreshToken}
+        AND EXPIRED_AT &gt; NOW()
+    </select>
+
+</mapper>

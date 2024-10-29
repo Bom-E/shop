@@ -55,6 +55,7 @@ const LoginPage = () => {
                     , refreshToken: response.data.refreshToken
                 }));
                 // 로그인 성공
+                alert(`${response.data.userId}님 환영합니다.`);
                 navigate('/');
                 
             }
@@ -79,6 +80,26 @@ const LoginPage = () => {
     }, [tokens.accessToken]);
 
     useEffect(() => {
+
+        const params =  new URLSearchParams(window.location.search);
+        const status = params.get('status');
+        const userData = {
+            userId: params.get('userId')
+            , email: params.get('email')
+            , registrationId: params.get('registrationId')
+            , userRole: params.get('userRole')
+        };
+
+        if(status === 'success'){
+            dispatch(loginSuccess(userData));
+            dispatch(setTokens({
+                accessToken: params.get('accessToken')
+                , refreshToken: params.get('refreshToken')
+            }));
+            alert(`${userData.userId}님 환영합니다.`);
+            console.log('test');
+            navigate('/');
+        }
 
     }, [dispatch, navigate]);
 

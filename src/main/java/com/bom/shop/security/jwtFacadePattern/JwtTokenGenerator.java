@@ -1,5 +1,6 @@
 package com.bom.shop.security.jwtFacadePattern;
 
+import com.bom.shop.security.SecureRandomStringGenerator;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +24,6 @@ public class JwtTokenGenerator {
     @Autowired
     public JwtTokenGenerator(@Qualifier("jwtProperties") JwtProperties jwtProperties){
         this.jwtProperties = jwtProperties;
-        System.out.println("JwtTokenGenerator constructor");
-        System.out.println("Secret Key: " + jwtProperties.getSecretKey());
-        System.out.println("Refresh Key: " + jwtProperties.getRefreshSecretKey());
 
         if(jwtProperties.getSecretKey() == null || jwtProperties.getRefreshSecretKey() == null){
             throw new IllegalStateException("Secret keys are not properly initialized");

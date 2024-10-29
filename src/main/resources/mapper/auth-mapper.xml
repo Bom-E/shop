@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 해당 파일에 모든 쿼리문을 작성 -->
+<mapper namespace="authMapper">
+
+    <resultMap id="userAddr" type="com.bom.shop.user.vo.UserAddrVO">
+        <id     column="ADDR_CODE"      property="addrCode"/>
+        <result column="ADDR"           property="addr"/>
+        <result column="ADDR_DETAIL"    property="addrDetail"/>
+        <result column="POST_CODE"      property="postCode"/>
+        <result column="IS_DEFAULT"     property="isDefault"/>
+        <result column="USER_ID"        property="userId"/>
+        <result column="CREATED_AT"     property="createdAt"/>
+        <result column="UPDATED_AT"     property="updatedAt"/>
+    </resultMap>
+
+<!-- sso 로그인 -->
+    <select id="ssoLoginSelect" resultMap="userMapper.userAccount">
+        SELECT UA.USER_ID
+            , EMAIL
+            , USER_ROLE
+            , USER_NAME
+            , REGISTRATION_ID
+        FROM USER_ACCOUNT UA
+        JOIN USER_PROFILE UP
+        ON UA.USER_ID = UP.USER_ID
+        WHERE UP.EMAIL = #{email}
+        AND UA.REGISTRATION_ID = #{registrationId}
+    </select>
+
+    <!-- 로그인용 별도 조회 쿼리(보안) -->
+    <select id="playLoginDataCheck" resultMap="userMapper.userAccount">
+        SELECT USER_ID
+            , USER_PW
+        FROM USER_ACCOUNT
+        WHERE USER_ID = #{userId}
+    </select>
+
+    <!-- 일반 로그인 -->
+    <select id="defaultLoginSelect" resultMap="userMapper.userAccount">
+        SELECT UA.USER_ID
+            , USER_ROLE
+            , USER_NAME
+        FROM USER_ACCOUNT UA
+        JOIN USER_PROFILE UP
+        ON UA.USER_ID = UP.USER_ID
+        WHERE UA.USER_ID = #{userId}
+    </select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
