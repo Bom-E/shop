@@ -16,7 +16,7 @@
     </resultMap>
 
 <!-- sso 로그인 -->
-    <select id="ssoLoginSelect" resultMap="userMapper.userAccount">
+    <select id="ssoLoginSelect" resultMap="signMapper.userAccount">
         SELECT UA.USER_ID
             , EMAIL
             , USER_ROLE
@@ -30,7 +30,7 @@
     </select>
 
     <!-- 로그인용 별도 조회 쿼리(보안) -->
-    <select id="playLoginDataCheck" resultMap="userMapper.userAccount">
+    <select id="playLoginDataCheck" resultMap="signMapper.userAccount">
         SELECT USER_ID
             , USER_PW
         FROM USER_ACCOUNT
@@ -38,7 +38,7 @@
     </select>
 
     <!-- 일반 로그인 -->
-    <select id="defaultLoginSelect" resultMap="userMapper.userAccount">
+    <select id="defaultLoginSelect" resultMap="signMapper.userAccount">
         SELECT UA.USER_ID
             , USER_ROLE
             , USER_NAME
@@ -47,6 +47,16 @@
         ON UA.USER_ID = UP.USER_ID
         WHERE UA.USER_ID = #{userId}
     </select>
+
+    <!-- 토큰용. 이메일로 이용자 정보 조회 -->
+    <select id="findByEmail" resultMap="signMapper.userAccount">
+        SELECT *
+        FROM USER_ACCOUNT UA
+        LEFT JOIN USER_PROFILE UP
+        ON UA.USER_ID = UP.USER_ID
+        WHERE UP.EMAIL = #{email}
+    </select>
+
 
 </mapper>
 

@@ -28,19 +28,19 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Override
     public UserAccountVO ssoLoginSelect(Map<String, String> params) {
 
-        return sqlSession.selectOne("userMapper.ssoLoginSelect", params);
+        return sqlSession.selectOne("signMapper.ssoLoginSelect", params);
     }
 
     @Override
     public UserAccountVO defaultLoginSelect(UserAccountVO loginData) {
-        UserAccountVO checkData = sqlSession.selectOne("userMapper.playLoginDataCheck", loginData.getUserId());
+        UserAccountVO checkData = sqlSession.selectOne("signMapper.playLoginDataCheck", loginData.getUserId());
 
         if(checkData != null && passwordEncoder.matches(loginData.getUserPw(), checkData.getUserPw())){
             System.out.println("Input PW :" + loginData.getUserPw());
             System.out.println("Stored Pw : " + checkData.getUserPw());
             System.out.println("Matches :" + passwordEncoder.matches(loginData.getUserPw(), checkData.getUserPw()));
 
-            return sqlSession.selectOne("userMapper.defaultLoginSelect", loginData);
+            return sqlSession.selectOne("signMapper.defaultLoginSelect", loginData);
         }
         return null;
     }
@@ -48,13 +48,12 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Override
     public UserAccountVO playLoginDataCheck(UserAccountVO userAccountVO) {
 
-        return sqlSession.selectOne("userMapper.playLoginDataCheck", userAccountVO);
+        return sqlSession.selectOne("signMapper.playLoginDataCheck", userAccountVO);
     }
 
-
     @Override
-    public List<String> getRolesByEmail(UserProfileVO userProfileVO) {
-        return sqlSession.selectList("userMapper.getRolesByEmail", userProfileVO);
+    public UserAccountVO findByEmail(String email) {
+        return sqlSession.selectOne("authMapper.findByEmail", email);
     }
 
 }

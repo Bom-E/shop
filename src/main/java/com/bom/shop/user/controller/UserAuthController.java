@@ -33,7 +33,7 @@ public class UserAuthController {
     // 일반 로그인
     @PostMapping("/login/defaultLogin")
     public ResponseEntity<?> defaultLogin(@RequestBody UserAccountVO loginData
-                                            , HttpServletResponse response) {
+            , HttpServletResponse response) {
         try {
 
             System.out.println(loginData);
@@ -73,8 +73,8 @@ public class UserAuthController {
     // 소셜 로그인
     @PostMapping("/login/socialLogin")
     public ResponseEntity<?> socialLogin(@RequestParam(name = "email", required = false) String email
-                                        , @RequestParam(name = "registrationId", required = false)String registrationId
-                                        , HttpServletResponse response) {
+            , @RequestParam(name = "registrationId", required = false) String registrationId
+            , HttpServletResponse response) {
 
         try {
 
@@ -116,22 +116,47 @@ public class UserAuthController {
         }
     }
 
-    // 토큰 체크
-    @GetMapping("/checkToken")
-    public ResponseEntity<?> checkToken(@CookieValue("access_token") String accessToken
-                                        , @CookieValue("refresh_token") String refreshToken) {
-
-        // 엑세스 토큰 체크
-        if(accessToken != null && jwtService.validateToken(accessToken, false)){
-            return ResponseEntity.ok().build();
-        }
-
-        // 리프레시 토큰 체크
-        if(refreshToken == null || !jwtService.validateToken(refreshToken, true)){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                                .body(Map.of("message", "재로그인이 필요합니다."));
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", ""));
     }
 
+    // 토큰 체크
+    @GetMapping("/checkToken")
+    public ResponseEntity<?> checkToken(@CookieValue(value = "access_token", required = false) String accessToken
+            , @CookieValue(value = "refresh_token", required = false) String refreshToken
+            , HttpServletResponse response) {
+        try {
+            // 액세스 토큰 체크
+            if (accessToken != null && jwtService.validateToken(accessToken, false)) {
+                return ResponseEntity.ok().body(Map.of("message", "Valid access token"));
+            }
+
+            // 액세스 토큰이 없거나 유효하지 않은 경우, 리프레시 토큰으로 갱신 요청
+            if (refreshToken != null && jwtService.validateToken(refreshToken, true)) {
+
+                String email = jwtService.getEmail(refreshToken, true);
+                UserAccountVO userAccountVO = userAuthService.findByEmail(email);
+
+                Authentication authentication = authenticationUtil.createAuthentication(userAccountVO);
+
+                // 새 액세스 토큰 발급
+                String newAccessToken = jwtService.generateAccessToken(authentication);
+
+                cookieUtil.addAccessTokenCookie(response, newAccessToken);
+
+                return ResponseEntity.ok()
+                        .body(Map.of(
+                                "message", "Access token refreshed successfully"
+                                , "userId", authenticationUtil.getUserId(authentication)
+                        ));
+            }
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Please Login again"));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Occur Server Error"));
+        }
+
+    }
 }

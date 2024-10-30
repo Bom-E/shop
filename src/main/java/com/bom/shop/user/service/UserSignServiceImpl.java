@@ -25,8 +25,8 @@ public class UserSignServiceImpl implements UserSignService{
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void ssoUserSign(UserAccountVO userAccountVO, UserProfileVO userProfileVO) {
-        sqlSession.insert("userMapper.signUserWithSso1", userAccountVO);
-        sqlSession.insert("userMapper.signUserWithSso2", userProfileVO);
+        sqlSession.insert("signMapper.signUserWithSso1", userAccountVO);
+        sqlSession.insert("signMapper.signUserWithSso2", userProfileVO);
     }
 
     // 일반 회원가입
@@ -36,13 +36,13 @@ public class UserSignServiceImpl implements UserSignService{
         String securityPw = passwordEncoder.encode(userAccountVO.getUserPw());
         userAccountVO.setUserPw(securityPw);
 
-        sqlSession.insert("userMapper.userSignInsert1", userAccountVO);
-        sqlSession.insert("userMapper.userSignInsert2", userProfileVO);
+        sqlSession.insert("signMapper.userSignInsert1", userAccountVO);
+        sqlSession.insert("signMapper.userSignInsert2", userProfileVO);
     }
 
     @Override
     public boolean joinCheck(String email) {
-        return sqlSession.selectOne("userMapper.joinCheck", email);
+        return sqlSession.selectOne("signMapper.joinCheck", email);
     }
 
 }

@@ -5,6 +5,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import api from '../../../api';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginFailure, loginSuccess, selectIsLoggedIn, selectToken, setTokens } from '../../../redux/reducers/authSlice';
+import { getCookie } from '../../../utils/cookies';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -51,8 +52,8 @@ const LoginPage = () => {
 
                 dispatch(loginSuccess(response.data.user));
                 dispatch(setTokens({
-                    accessToken: response.data.accessToken
-                    , refreshToken: response.data.refreshToken
+                    accessToken: getCookie('access_token')
+                    , refreshToken: getCookie('refresh_token')
                 }));
                 // 로그인 성공
                 alert(`${response.data.userId}님 환영합니다.`);
@@ -93,8 +94,8 @@ const LoginPage = () => {
         if(status === 'success'){
             dispatch(loginSuccess(userData));
             dispatch(setTokens({
-                accessToken: params.get('accessToken')
-                , refreshToken: params.get('refreshToken')
+                accessToken: getCookie('access_token')
+                , refreshToken: getCookie('refresh_token')
             }));
             alert(`${userData.userId}님 환영합니다.`);
             console.log('test');

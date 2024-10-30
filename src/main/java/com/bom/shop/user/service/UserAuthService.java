@@ -18,7 +18,6 @@ public interface UserAuthService {
     // 일반 로그인 로그인용
     UserAccountVO playLoginDataCheck(UserAccountVO userAccountVO);
 
-    // refreshToken 갱신
-    List<String> getRolesByEmail(UserProfileVO userProfileVO);
-
+    // 토큰 검증 후 사용자 정보 재조회
+    UserAccountVO findByEmail(String email);
 }
