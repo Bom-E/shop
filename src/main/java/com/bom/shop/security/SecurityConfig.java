@@ -77,11 +77,12 @@ public class SecurityConfig {
                     .authorizationEndpoint(authorization -> authorization
                             .baseUri("/oauth2/authorization"))
                     .redirectionEndpoint(redirection -> redirection
-                            .baseUri("/login/oauth2/code/*"))
-                    .successHandler(tokenAuthenticationSuccessHandler())
-                    .failureHandler(new TokenAuthenticationFailureHandler(objectMapper))
+                            .baseUri("/oauth/callback/*"))
                     .userInfoEndpoint(userInfo ->
                             userInfo.userService(customUserDetailsService))
+                    .successHandler(tokenAuthenticationSuccessHandler())
+                    .failureHandler(new TokenAuthenticationFailureHandler(objectMapper))
+
             )
             .exceptionHandling(exceptionHandling -> exceptionHandling
                 .authenticationEntryPoint((request, response, authException) -> {
@@ -102,10 +103,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://accounts.google.com"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+//        "Authorization", "Content-Type", "X-Requested-With"
         configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(Arrays.asList("Set-Cookie"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

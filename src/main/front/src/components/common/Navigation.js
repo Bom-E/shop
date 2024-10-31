@@ -1,6 +1,16 @@
 import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { selectIsLoggedIn, selectUser } from "../../redux/reducers/authSlice";
+import { handleLogout } from "../../utils/auth";
 
 const Navigation = ({navItems, isActive, navigateTo, className = ''}) => {
+    const dispatch = useDispatch();
+    const isLoggedIn = useSelector(selectIsLoggedIn);
+    const user = useSelector(selectUser);
+
+    const onLogout = () => {
+        handleLogout(dispatch, navigateTo)();
+    }
 
     return(
         <nav className={`border-gray-200 dark:bg-gray-900 mt-auto ${className}`}>
@@ -21,12 +31,26 @@ const Navigation = ({navItems, isActive, navigateTo, className = ''}) => {
                     ))}
                 </ul>
                 <div className="flex space-x-4">
-                    <button onClick={() => navigateTo('/auth/login')} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
-                        로그인
-                    </button>
-                    <button onClick={() => navigateTo('/auth/sign1')} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
-                        회원가입
-                    </button>
+                    {isLoggedIn ? (
+                        <>
+                            <span className="px-4 py-2 text-sm font-medium text-gray-500">
+                                {user?.userId}님
+                            </span>
+                            <button onClick={onLogout} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                                로그아웃
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <button onClick={() => navigateTo('/auth/login')} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                                로그인
+                            </button>
+                            <button onClick={() => navigateTo('/auth/sign1')} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                                회원가입
+                            </button>
+                        </>
+                    )}
+                    
                     <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
                         마이페이지
                     </button>

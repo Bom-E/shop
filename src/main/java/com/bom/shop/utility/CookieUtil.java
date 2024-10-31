@@ -57,4 +57,23 @@ public class CookieUtil {
         }
         return null;
     }
+
+    public void deleteAuthTokenCookie(HttpServletResponse response){
+
+        // 액세스 토큰 쿠키 삭제
+        Cookie accessCookie = new Cookie(ACCESS_TOKEN, null);
+        accessCookie.setPath(COOKIE_PATH);
+        accessCookie.setHttpOnly(true);
+        accessCookie.setSecure(true);
+        accessCookie.setMaxAge(0);
+        response.addCookie(accessCookie);
+
+        // 리프레시 토큰 쿠키 삭제
+        Cookie refreshToken = new Cookie(REFRESH_TOKEN, null);
+        refreshToken.setPath(COOKIE_PATH);
+        refreshToken.setHttpOnly(true);
+        refreshToken.setSecure(true);
+        refreshToken.setMaxAge(0);
+        response.addCookie(refreshToken);
+    }
 }

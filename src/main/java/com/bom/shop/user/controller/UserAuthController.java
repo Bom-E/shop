@@ -1,6 +1,7 @@
 package com.bom.shop.user.controller;
 
 import com.bom.shop.security.jwtFacadePattern.JwtService;
+import com.bom.shop.user.service.RefreshTokenMangeService;
 import com.bom.shop.user.service.UserAuthService;
 import com.bom.shop.user.vo.UserAccountVO;
 import com.bom.shop.user.vo.UserProfileVO;
@@ -8,7 +9,9 @@ import com.bom.shop.utility.AuthenticationUtil;
 import com.bom.shop.utility.CookieUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.logging.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,18 +20,26 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin(origins = "http://localhost:3000")
 public class UserAuthController {
-    @Resource(name = "jwtService")
-    JwtService jwtService;
-    @Resource(name = "userAuthService")
-    UserAuthService userAuthService;
-    @Resource(name = "cookieUtil")
-    CookieUtil cookieUtil;
-    @Resource(name = "authenticationUtil")
-    AuthenticationUtil authenticationUtil;
+
+    private final JwtService jwtService;
+    private final UserAuthService userAuthService;
+    private final CookieUtil cookieUtil;
+    private final AuthenticationUtil authenticationUtil;
+    private final RefreshTokenMangeService refreshTokenMangeService;
+
+    @Autowired
+    public UserAuthController(JwtService jwtService, UserAuthService userAuthService, CookieUtil cookieUtil, AuthenticationUtil authenticationUtil, RefreshTokenMangeService refreshTokenMangeService){
+        this.jwtService = jwtService;
+        this.userAuthService = userAuthService;
+        this.cookieUtil = cookieUtil;
+        this.authenticationUtil = authenticationUtil;
+        this.refreshTokenMangeService = refreshTokenMangeService;
+    }
 
     // 일반 로그인
     @PostMapping("/login/defaultLogin")
@@ -73,8 +84,8 @@ public class UserAuthController {
     // 소셜 로그인
     @PostMapping("/login/socialLogin")
     public ResponseEntity<?> socialLogin(@RequestParam(name = "email", required = false) String email
-            , @RequestParam(name = "registrationId", required = false) String registrationId
-            , HttpServletResponse response) {
+                                        , @RequestParam(name = "registrationId", required = false) String registrationId
+                                        , HttpServletResponse response) {
 
         try {
 
@@ -117,15 +128,47 @@ public class UserAuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(){
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", ""));
+    public ResponseEntity<?> logout(@RequestParam(required = false) String logoutType
+                                    , @CookieValue(value = "refresh_token", required = false) String refreshToken
+                                    , HttpServletResponse response){
+
+        try {
+            cookieUtil.deleteAuthTokenCookie(response);
+
+            if(refreshToken != null){
+                String email = jwtService.getEmail(refreshToken, true);
+                UserAccountVO userAccountVO = userAuthService.findByEmail(email);
+
+                if(userAccountVO != null){
+                    refreshTokenMangeService.deleteByUserId(userAccountVO.getUserId());
+                }
+            }
+
+            String message = "auto".equals(logoutType)
+                    ? "자동 로그아웃 되었습니다. 다시 로그인 해주세요."
+                    : "로그아웃 되었습니다.";
+
+            return ResponseEntity.ok().body(Map.of(
+                    "status", "success"
+                    , "message", message
+                    , "logoutType", logoutType != null ? logoutType : "default"
+            ));
+
+        } catch (Exception e) {
+            log.error("Logout failed", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "status", "error",
+                            "message", "로그아웃 중 오류가 발생했습니다."
+                    ));
+        }
     }
 
     // 토큰 체크
     @GetMapping("/checkToken")
     public ResponseEntity<?> checkToken(@CookieValue(value = "access_token", required = false) String accessToken
-            , @CookieValue(value = "refresh_token", required = false) String refreshToken
-            , HttpServletResponse response) {
+                                        , @CookieValue(value = "refresh_token", required = false) String refreshToken
+                                        , HttpServletResponse response) {
         try {
             // 액세스 토큰 체크
             if (accessToken != null && jwtService.validateToken(accessToken, false)) {

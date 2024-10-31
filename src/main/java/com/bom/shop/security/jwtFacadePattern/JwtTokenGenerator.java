@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Service("jwtTokenGenerator")
 public class JwtTokenGenerator {
     private final JwtProperties jwtProperties;
-    private final Key key;
+    private final Key accessKey;
     private final Key refreshKey;
 
     @Autowired
@@ -29,7 +29,7 @@ public class JwtTokenGenerator {
             throw new IllegalStateException("Secret keys are not properly initialized");
         }
 
-        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
+        this.accessKey = Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
         this.refreshKey = Keys.hmacShaKeyFor(jwtProperties.getRefreshSecretKey().getBytes(StandardCharsets.UTF_8));
     }
 
@@ -42,7 +42,7 @@ public class JwtTokenGenerator {
                     .collect(Collectors.toList()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getAccessExpireTime()))
-                .signWith(key)
+                .signWith(accessKey)
                 .compact();
     }
 

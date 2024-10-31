@@ -4,6 +4,29 @@
 <!-- 해당 파일에 모든 쿼리문을 작성 -->
 <mapper namespace="authMapper">
 
+    <resultMap id="userAccount" type="com.bom.shop.user.vo.UserAccountVO">
+        <id     column="USER_ID"    property="userId"/>
+        <result column="USER_PW"    property="userPw"/>
+        <result column="USER_ROLE"  property="userRole"/>
+        <result column="REGISTRATION_ID" property="registrationId"/>
+        <result column="CREATED_AT" property="createdAt"/>
+        <result column="UPDATED_AT" property="updatedAt"/>
+        <association property="userProfileVO" resultMap="userProfile"/>
+        <collection property="userAddrVO" resultMap="userAddr"/>
+    </resultMap>
+
+    <resultMap id="userProfile" type="com.bom.shop.user.vo.UserProfileVO">
+        <id     column="USER_ID"    property="userId"/>
+        <result column="USER_NAME"  property="userName"/>
+        <result column="GENDER"     property="gender"/>
+        <result column="EMAIL"      property="email"/>
+        <result column="USER_TEL"   property="userTel"/>
+        <result column="BIRTH_DATE" property="birthDate"/>
+        <result column="JOIN_DATE"  property="joinDate"/>
+        <result column="CREATED_AT" property="createdAt"/>
+        <result column="UPDATED_AT" property="updatedAt"/>
+    </resultMap>
+
     <resultMap id="userAddr" type="com.bom.shop.user.vo.UserAddrVO">
         <id     column="ADDR_CODE"      property="addrCode"/>
         <result column="ADDR"           property="addr"/>
@@ -15,8 +38,8 @@
         <result column="UPDATED_AT"     property="updatedAt"/>
     </resultMap>
 
-<!-- sso 로그인 -->
-    <select id="ssoLoginSelect" resultMap="signMapper.userAccount">
+    <!-- sso 로그인 -->
+    <select id="ssoLoginSelect" resultMap="userAccount">
         SELECT UA.USER_ID
             , EMAIL
             , USER_ROLE
@@ -30,7 +53,7 @@
     </select>
 
     <!-- 로그인용 별도 조회 쿼리(보안) -->
-    <select id="playLoginDataCheck" resultMap="signMapper.userAccount">
+    <select id="playLoginDataCheck" resultMap="userAccount">
         SELECT USER_ID
             , USER_PW
         FROM USER_ACCOUNT
@@ -38,7 +61,7 @@
     </select>
 
     <!-- 일반 로그인 -->
-    <select id="defaultLoginSelect" resultMap="signMapper.userAccount">
+    <select id="defaultLoginSelect" resultMap="userAccount">
         SELECT UA.USER_ID
             , USER_ROLE
             , USER_NAME
@@ -49,7 +72,7 @@
     </select>
 
     <!-- 토큰용. 이메일로 이용자 정보 조회 -->
-    <select id="findByEmail" resultMap="signMapper.userAccount">
+    <select id="findByEmail" resultMap="userAccount">
         SELECT *
         FROM USER_ACCOUNT UA
         LEFT JOIN USER_PROFILE UP
@@ -57,36 +80,4 @@
         WHERE UP.EMAIL = #{email}
     </select>
 
-
 </mapper>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

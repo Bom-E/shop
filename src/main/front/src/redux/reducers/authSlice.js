@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSelector, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     isLoggedIn: false
@@ -52,7 +52,7 @@ const authSlice = createSlice({
         }
         , setTokens: (state, action) => {
             state.accessToken = action.payload.accessToken;
-            state.refreshToken = action.payload.accessToken;
+            state.refreshToken = action.payload.refreshToken;
         }
         , setUser: (state, action) => {
             state.user = action.payload;
@@ -82,9 +82,12 @@ export const selectUser = (state) => state.auth.user;
 export const selectIsLoggedIn = (state) => state.auth.isLoggedIn;
 export const selectError = (state) => state.auth.error;
 export const selectIsSSO = (state) => state.auth.isSSO;
-export const selectToken = (state) => ({
-    accessToken: state.auth.accessToken
-    , refreshToken: state.auth.refreshToken
-}); 
+export const selectToken = createSelector(
+    [(state) => state.auth]
+    , (auth) => ({
+        accessToken: auth.accessToken
+        , refreshToken: auth.refreshToken
+    })
+);
 
 export default authSlice.reducer;

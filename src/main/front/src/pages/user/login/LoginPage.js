@@ -6,6 +6,7 @@ import api from '../../../api';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginFailure, loginSuccess, selectIsLoggedIn, selectToken, setTokens } from '../../../redux/reducers/authSlice';
 import { getCookie } from '../../../utils/cookies';
+import store from '../../../redux/store';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -65,6 +66,7 @@ const LoginPage = () => {
             switch(error.response?.status){
                 case 401:
                     alert('아이디 또는 비밀번호가 일치하지 않습니다.');
+                    break;
                 case 500 :
                     alert('서버 오류가 발생했습니다.');
                     break;
@@ -76,32 +78,123 @@ const LoginPage = () => {
 
     useEffect(() => {
         if(tokens.accessToken){
-            // ㅌ큰 만료 로직 만들거임
+            
+            const checkToken = async () => {
+                try{
+                    
+                    const response = await api.get('/auth/checkToken');
+
+                    if(response.data.message === "Valid access token"){
+                        console.log("유효한 토큰");
+                    } else if(response.data.message === "Access token refreshed successfully"){
+                        console.log("토큰 갱신 완료");
+                        dispatch(setTokens({
+                            accessToken: getCookie('access_token')
+                            , refreshToken: getCookie('refresh_token')
+                        }));
+                    } else {
+                        alert("토큰이 만료 되었습니다. 다시 로그인 해주세요.");
+                        navigate('/auth/login');
+                    }
+
+                } catch (error) {
+                    console.log("Token check failed:", error)
+                    alert("비정상적 토큰 감지, 다시 로그인 해주세요.");
+                    navigate('/auth/login');
+                }
+            };
+
+            checkToken();
         }
-    }, [tokens.accessToken]);
+    }, [tokens.accessToken, dispatch, navigate]);
+
+    // useEffect(() => {
+
+    //     const params =  new URLSearchParams(window.location.search);
+    //     console.log("Full URL: ", window.location.href);
+    //     console.log("All params: ", Object.fromEntries(params));
+    //     const status = params.get('status');
+    //     const userData = {
+    //         userId: params.get('userId')
+    //         , email: params.get('email')
+    //         , registrationId: params.get('registrationId')
+    //         , userRole: params.get('userRole')
+    //     };
+
+    //     console.log('Status:', status);
+    //     console.log('UserData:', userData);
+    //     console.log('Store state:', store.getState());
+
+    //     if(status === 'success'){
+
+    //         if(!userData.userId){
+    //             console.log("Warning: userId is missing from URL params");
+    //         }
+
+    //         const user = store.getState().auth.user;
+    //         if(user?.userId){
+    //             alert(`${user.userId}님 환영합니다.`);
+    //         } else if(userData.userId){
+    //             alert(`${userData.userId}님 환영합니다.`);
+    //         } else if(userData.email){
+    //             alert(`${userData.email}님 환영합니다.`);
+    //         }
+
+
+    //         dispatch(loginSuccess(userData));
+    //         dispatch(setTokens({
+    //             accessToken: getCookie('access_token')
+    //             , refreshToken: getCookie('refresh_token')
+    //         }));
+    //         // alert(`${userData.userId}님 환영합니다.`);
+    //         console.log('test');
+    //         navigate('/');
+    //     }
+
+    // }, [dispatch, navigate]);
 
     useEffect(() => {
+        // 페이지 로드 시 한 번만 실행 되도록 빈 의존 배열 사용
+    }, []);
 
-        const params =  new URLSearchParams(window.location.search);
-        const status = params.get('status');
-        const userData = {
-            userId: params.get('userId')
-            , email: params.get('email')
-            , registrationId: params.get('registrationId')
-            , userRole: params.get('userRole')
-        };
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+           
+        if(params.toString()){
 
-        if(status === 'success'){
-            dispatch(loginSuccess(userData));
-            dispatch(setTokens({
-                accessToken: getCookie('access_token')
-                , refreshToken: getCookie('refresh_token')
-            }));
-            alert(`${userData.userId}님 환영합니다.`);
-            console.log('test');
-            navigate('/');
+                console.log("Full URL: ", window.location.href);
+                console.log("All params: ", Object.fromEntries(params));
+
+                const status = params.get('status');
+                const userData = {
+                    userId: params.get('userId')
+                    , email: params.get('email')
+                    , registrationId: params.get('registrationId')
+                    , userRole: params.get('userRole')
+                };
+
+            if(status === 'success'){
+
+                console.log('OAuth2 Login - Status:', status);
+                console.log('OAuth2 Login - UserData:', userData);
+
+                if(userData.userId || userData.email){
+
+                    dispatch(loginSuccess(userData));
+                    dispatch(setTokens({
+                        accessToken: getCookie('access_token')
+                        , refreshToken: getCookie('refresh_token')
+                    }));
+                }
+
+                if(userData.userId){
+                    alert(`${userData.userId}님 환영합니다.`);
+                } else if (userData.email){
+                    alert(`${userData.email}님 환영합니다.`);
+                }
+                navigate('/');
+            }
         }
-
     }, [dispatch, navigate]);
 
     const handleSocialLogin = (socialName) => {

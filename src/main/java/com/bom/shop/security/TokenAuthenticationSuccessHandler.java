@@ -14,6 +14,8 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
@@ -103,8 +105,18 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
     private void processOAuth2Login(UserAccountVO user, String email, String registrationId, HttpServletResponse response) throws IOException{
         Authentication newAuth = authenticationUtil.createAuthentication(user);
         setAuthToken(response, newAuth);
-//        sendSuccessResponse(response, createOAuth2LoginResponse(email, registrationId, user));
-        response.sendRedirect(FRONTEND_URL);
+
+        Map<String, String> responseData = createOAuth2LoginResponse(email, registrationId, user);
+
+        System.out.println("OAuth2 Response Data: " + responseData);
+
+        String targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_URL + "/oauth/callback/google")
+                .queryParams(convertMapToMultiValueMap(responseData))
+                .build().toUriString();
+
+        System.out.println("Redirect URL: " + targetUrl);
+
+        response.sendRedirect(targetUrl);
     }
 
     private void processDefaultLogin(UserAccountVO user, String userId, HttpServletResponse response) throws IOException{
@@ -164,6 +176,12 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
         String targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_URL + "/auth/sign1/defaultSignup")
                 .build().toUriString();
         response.sendRedirect(targetUrl);
+    }
+
+    private MultiValueMap<String, String> convertMapToMultiValueMap(Map<String, String> map){
+        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+        map.forEach(multiValueMap::add);
+        return multiValueMap;
     }
 
     private String extractEmail(OAuth2User oauth2User, String registrationId){
