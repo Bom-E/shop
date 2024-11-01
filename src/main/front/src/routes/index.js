@@ -10,6 +10,7 @@ import { Navigate } from 'react-router-dom';
 import DomSignup from '../pages/user/sign/DomSignup';
 import ForSignup from '../pages/user/sign/ForSignup';
 import LoginPage from '../pages/user/login/LoginPage';
+import OAuthCallback from '../components/common/OAuthCallback';
 
 
 export const navItems = [
@@ -43,6 +44,7 @@ const routes = [
     , { path: 'auth/sign1/defaultSignup', element: <DomSignup /> }
     , { path: 'auth/sign1/ssoSignup', element: <DomSignup /> }
     , { path: 'auth/sign2/forSignup', element: <ForSignup /> }
+    , { path: 'oauth/callback/:proider', element: <OAuthCallback/> }
 
 ];
 

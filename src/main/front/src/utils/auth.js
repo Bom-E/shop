@@ -2,6 +2,7 @@ import api from "../api";
 import { logout, setTokens } from "../redux/reducers/authSlice";
 import { getCookie } from "./cookies";
 
+
 export const handleLogout = (dispatch, navigate) => {
     return async () => {
         try{

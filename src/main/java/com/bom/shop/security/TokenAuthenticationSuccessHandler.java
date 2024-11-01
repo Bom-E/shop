@@ -110,7 +110,7 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
 
         System.out.println("OAuth2 Response Data: " + responseData);
 
-        String targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_URL + "/oauth/callback/google")
+        String targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_URL + "/oauth/callback/" + registrationId)
                 .queryParams(convertMapToMultiValueMap(responseData))
                 .build().toUriString();
 

@@ -3,6 +3,7 @@ import springLogo from '../../assets/with_Spring_removebg.png';
 import topBanner from '../../assets/topBanner.png';
 import headerAD from '../../assets/headerAD.png';
 import useClickOutside from '../../hooks/common/useClickOutside';
+import { useNavigate } from 'react-router-dom';
 
 const UserHeader = ({navHome}) => {
 

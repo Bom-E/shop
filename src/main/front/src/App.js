@@ -14,22 +14,19 @@ function Header() {
   return(
 
     <div>
-    
         <header className="bg-transparent">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row items-center justify-between">
-              <UserHeader navHome={() => navigateTo('/')} userSign={() => navigateTo('/auth/sign1')} login={() => navigateTo('/auth/login')}/>
-              
+              <UserHeader 
+                navHome={() => navigateTo('/')} />
             </div>
           </div>
-
         </header>
-
     </div>
 
   );
 
-}
+};
 
 function AppContent() {
   const navigate= useNavigate();
@@ -38,12 +35,12 @@ function AppContent() {
   const isActive = (path) => location.pathname === path;
   const navigateTo = (path) => navigate(path);
 
-  const hideHederFooter = location.pathname.includes('auth');
+  const hideHeaderFooter = location.pathname.includes('auth');
 
   return (
     
     <div className="flex flex-col min-h-screen">
-    {!hideHederFooter && (
+    {!hideHeaderFooter && (
       <>
         <Header/>
           <div className="xl:mt-8">
@@ -58,12 +55,12 @@ function AppContent() {
           <Routes>
             {routes.map((route, index) => (
               <Route 
-                key={index}
+                key={route.path || index}
                 path={route.path}
                 element={route.element || <route.component />}>
                 {route.children && route.children.map((childRoute, childIndex) => (
                   <Route
-                    key={childIndex}
+                    key={childRoute.path || childRoute.index}
                     index={childRoute.index}
                     path={childRoute.path}
                     element={childRoute.element || <childRoute.component />}/>
@@ -74,7 +71,7 @@ function AppContent() {
         </div>  
       </main>
 
-      {!hideHederFooter && <UserFooter/>}
+      {!hideHeaderFooter && <UserFooter/>}
       
     </div>      
   );
