@@ -44,7 +44,7 @@ const routes = [
     , { path: 'auth/sign1/defaultSignup', element: <DomSignup /> }
     , { path: 'auth/sign1/ssoSignup', element: <DomSignup /> }
     , { path: 'auth/sign2/forSignup', element: <ForSignup /> }
-    , { path: 'oauth/callback/:proider', element: <OAuthCallback/> }
+    , { path: 'oauth/callback/:provider', element: <OAuthCallback/> }
 
 ];
 

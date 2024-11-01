@@ -41,7 +41,11 @@ public class OAuth2CallbackController {
 
         try {
             String code = payload.get("code");
-            String email = code.;
+            String state = payload.get("state");
+
+            String accessToken = exchangeCodeForToken(code, provider);
+
+            Map<String, Object> userInfo = getUser
 
             Map<String, String> params = new HashMap<>();
             params.put("registrationId", provider);
