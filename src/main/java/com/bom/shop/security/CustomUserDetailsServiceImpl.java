@@ -11,7 +11,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -33,31 +35,42 @@ public class CustomUserDetailsServiceImpl extends DefaultOAuth2UserService imple
     // sso
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oauth2User = super.loadUser(userRequest);
+        OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
+        OAuth2User oauth2User = delegate.loadUser(userRequest);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
-        String userNameAttributeName = userRequest.getClientRegistration()
-                                                    .getProviderDetails()
-                                                    .getUserInfoEndpoint()
-                                                    .getUserNameAttributeName();
-
         String email = extractEmail(oauth2User, registrationId);
 
-        Map<String, String> params = new HashMap<>();
-        params.put("email", email);
-        params.put("registrationId", registrationId);
+        System.out.println("~ CustomUserDetailService Processing OAuth2 login~");
+        System.out.println("Email: " + email);
+        System.out.println("RegistrationId: " + registrationId);
 
-        UserAccountVO userAccountVO = userAuthService.ssoLoginSelect(params);
+        try {
+            Map<String, String> params = new HashMap<>();
+            params.put("email", email);
+            params.put("registrationId", registrationId);
 
-        if(userAccountVO == null){
-            throw new OAuth2AuthenticationException("User not found");
+            UserAccountVO user = userAuthService.ssoLoginSelect(params);
+
+            if(user == null){
+                Map<String, Object> attributes = new HashMap<>(oauth2User.getAttributes());
+                attributes.put("registrationId", registrationId);
+                attributes.put("isNewUser", true);
+                System.out.println("New user detected: " + email);
+
+                return new DefaultOAuth2User(
+                        Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
+                        , attributes
+                        , "email"
+                );
+            }
+
+            return oauth2User;
+
+        } catch (Exception e) {
+            System.out.println("Error during OAuth2 authentication: " + e.getMessage());
+            throw new OAuth2AuthenticationException("Authentication failed: " + e.getMessage());
         }
-
-        return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + userAccountVO.getUserRole()))
-                , oauth2User.getAttributes()
-                , userNameAttributeName
-        );
     }
 
     // 일반

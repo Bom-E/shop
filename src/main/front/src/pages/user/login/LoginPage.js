@@ -41,41 +41,6 @@ const LoginPage = () => {
         }));
     };
 
-    const handleDefaultLogin = async (e) => {
-        e.preventDefault();
-
-        try {
-            const response = await api.post('/auth/login/defaultLogin', loginData);
-
-            console.log('######:', loginData);
-
-            if(response.data.status === 'success'){
-
-                dispatch(loginSuccess(response.data.user));
-                dispatch(setTokens({
-                    accessToken: getCookie('access_token')
-                    , refreshToken: getCookie('refresh_token')
-                }));
-                // 로그인 성공
-                alert(`${response.data.userId}님 환영합니다.`);
-                navigate('/');
-                
-            }
-        } catch (error) {
-            dispatch(loginFailure(error.response?.data?.message));
-            switch(error.response?.status){
-                case 401:
-                    alert('아이디 또는 비밀번호가 일치하지 않습니다.');
-                    break;
-                case 500 :
-                    alert('서버 오류가 발생했습니다.');
-                    break;
-                default:
-                    alert('로그인 중 오류가 발생했습니다.');
-            }
-        }
-    };
-
     useEffect(() => {
         if(tokens.accessToken){
             
@@ -92,10 +57,7 @@ const LoginPage = () => {
                             accessToken: getCookie('access_token')
                             , refreshToken: getCookie('refresh_token')
                         }));
-                    } else {
-                        alert("토큰이 만료 되었습니다. 다시 로그인 해주세요.");
-                        navigate('/auth/login');
-                    }
+                    } 
 
                 } catch (error) {
                     console.log("Token check failed:", error)
@@ -106,103 +68,18 @@ const LoginPage = () => {
 
             checkToken();
         }
-    }, [tokens.accessToken, dispatch, navigate]);
-
-    // useEffect(() => {
-
-    //     const params =  new URLSearchParams(window.location.search);
-    //     console.log("Full URL: ", window.location.href);
-    //     console.log("All params: ", Object.fromEntries(params));
-    //     const status = params.get('status');
-    //     const userData = {
-    //         userId: params.get('userId')
-    //         , email: params.get('email')
-    //         , registrationId: params.get('registrationId')
-    //         , userRole: params.get('userRole')
-    //     };
-
-    //     console.log('Status:', status);
-    //     console.log('UserData:', userData);
-    //     console.log('Store state:', store.getState());
-
-    //     if(status === 'success'){
-
-    //         if(!userData.userId){
-    //             console.log("Warning: userId is missing from URL params");
-    //         }
-
-    //         const user = store.getState().auth.user;
-    //         if(user?.userId){
-    //             alert(`${user.userId}님 환영합니다.`);
-    //         } else if(userData.userId){
-    //             alert(`${userData.userId}님 환영합니다.`);
-    //         } else if(userData.email){
-    //             alert(`${userData.email}님 환영합니다.`);
-    //         }
-
-
-    //         dispatch(loginSuccess(userData));
-    //         dispatch(setTokens({
-    //             accessToken: getCookie('access_token')
-    //             , refreshToken: getCookie('refresh_token')
-    //         }));
-    //         // alert(`${userData.userId}님 환영합니다.`);
-    //         console.log('test');
-    //         navigate('/');
-    //     }
-
-    // }, [dispatch, navigate]);
-
-    useEffect(() => {
-        // 페이지 로드 시 한 번만 실행 되도록 빈 의존 배열 사용
     }, []);
-
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-           
-        if(params.toString()){
-
-                console.log("Full URL: ", window.location.href);
-                console.log("All params: ", Object.fromEntries(params));
-
-                const status = params.get('status');
-                const userData = {
-                    userId: params.get('userId')
-                    , email: params.get('email')
-                    , registrationId: params.get('registrationId')
-                    , userRole: params.get('userRole')
-                };
-
-            if(status === 'success'){
-
-                console.log('OAuth2 Login - Status:', status);
-                console.log('OAuth2 Login - UserData:', userData);
-
-                if(userData.userId || userData.email){
-
-                    dispatch(loginSuccess(userData));
-                    dispatch(setTokens({
-                        accessToken: getCookie('access_token')
-                        , refreshToken: getCookie('refresh_token')
-                    }));
-                }
-
-                if(userData.userId){
-                    alert(`${userData.userId}님 환영합니다.`);
-                } else if (userData.email){
-                    alert(`${userData.email}님 환영합니다.`);
-                }
-                navigate('/');
-            }
-        }
-    }, [dispatch, navigate]);
 
     const handleSocialLogin = (socialName) => {
        
         // 인증 페이지로 리다이렉션
         window.location.href = `http://localhost:8081/oauth2/authorization/${socialName}`;
-
+    
     };
+
+    useEffect(() => {
+        // 페이지 로드 시 한 번만 실행 되도록 빈 의존 배열 사용
+    }, []);
 
     return (
         <div className='flex flex-col items-center min-h-screen'>

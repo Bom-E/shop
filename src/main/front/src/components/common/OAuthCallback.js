@@ -1,5 +1,4 @@
 import { useNavigate, useParams } from "react-router-dom";
-import api from "../../api";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { getCookie } from "../../utils/cookies";
@@ -11,66 +10,55 @@ export const OAuthCallback = () => {
     const { provider } = useParams();
 
     useEffect(() => {
+
+        console.log("Currnet cookies:", document.cookie);
+
+        // 토큰 확인
+        const accessToken = getCookie('access_token');
+        const refreshToken = getCookie('refresh_token');
+        console.log("Access Token:", accessToken);
+        console.log("Refresh Token:", refreshToken);
         
+        // URL 파라미터에서 사용자 정보 가져오기
         const params = new URLSearchParams(window.location.search);
+        const status = params.get('status');
         console.log("OAuth callback - Full URL:", window.location.href);
-        console.log("OAuth Callback - All params:", Object.fromEntries(params));
+        params.forEach((value, key) => {
+            console.log(`${key}: ${value}`);
+        })
         console.log("OAuth provider:", provider);
+        console.log("Status:", status);
 
-        const code = params.get('code');
-        const error = params.get('error');
+        if(status === 'success'){
 
-        if(error){
-            console.error("OAuth error:", error);
-            alert("로그인 중 오류가 발생했습니다.");
-            navigate('/auth/login');
-            return ;
-        }
-
-        if(code){
-            const fetchUserInfo = async () => {
-                try{
-                    const response = await api.post(`/auth/oauth2/callback/${provider}`, {
-                        code
-                        , state: params.get('state')
-                    });
-
-                    if(response.datat.status === 'success'){
-                        const userData = {
-                            userId: response.data.userId
-                            , email: response.data.email
-                            , registrationId: provider
-                            , userRole: response.data.userRole
-                        };
-
-                        dispatch(loginSuccess(userData));
-                        dispatch(setTokens({
-                            accessToken: getCookie('access_token')
-                            , refreshToken: getCookie('refresh_token')
-                        }));
-
-                        if(userData.userId){
-                            alert(`${userData.userId}님 환영합니다!`);
-                        } else if(userData.email){
-                            alert(`${userData.email}님 환영합니다!`);
-                        }
-                        navigate('/');
-                    } else {
-                        throw new Error("Login failed");
-                    }
-                } catch (error) {
-                    console.error("OAuth login failed:", error);
-                    alert("로그인 처리 중 오류가 발생했습니다.");
-                    navigate('/auth/login');
-                }
+            const userData = {
+                userId: params.get('userId')
+                , email: params.get('email')
+                , registrationId: provider
+                , userRole: params.get('userRole')
             };
+            if(accessToken && refreshToken){
+                dispatch(setTokens({
+                    accessToken
+                    , refreshToken
+                }));
+            }
+    
+            dispatch(loginSuccess(userData));
 
-            fetchUserInfo();
+            if(userData.userId){
+                alert(`${userData.userId}님 환영합니다!`);
+            } else if(userData.email){
+                alert(`${userData.email}님 환영합니다!`);
+            }
+
+            navigate('/', { replace: true });
+
         } else {
-            console.error("No authentication code received");
-            navigate('/auth/login');
+            console.error("Authentication failed");
+            alert("다시 로그인해주세요.");
+            navigate('/auth/login', { replace: true });
         }
-
     }, [dispatch, navigate, provider]);
 };
 

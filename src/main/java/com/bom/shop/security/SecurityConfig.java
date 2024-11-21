@@ -7,6 +7,7 @@ import com.bom.shop.utility.AuthenticationUtil;
 import com.bom.shop.utility.CookieUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -34,6 +35,8 @@ public class SecurityConfig {
     private final CookieUtil cookieUtil;
     private final AuthenticationUtil authenticationUtil;
     private final CustomUserDetailsServiceImpl customUserDetailsService;
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     public SecurityConfig(JwtServiceFactory jwtServiceFactory, ObjectMapper objectMapper, UserAuthService userAuthService, CookieUtil cookieUtil, AuthenticationUtil authenticationUtil, CustomUserDetailsServiceImpl customUserDetailsService){
         this.jwtServiceFactory = jwtServiceFactory;
@@ -59,7 +62,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable) // 혹시 나중에 시간 여유가 되면 추가 보안 설정 해보기
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/", "/index.html", "/login/**", "/oauth2/**", "/auth/**", "/api/**").permitAll()
+                    .requestMatchers("/", "/index.html", "/login/oauth2/code/*", "/oauth2/authorization/*", "oauth2/**", "/auth/**", "/api/**", "/login/*").permitAll()
                     // .requestMatchers("/user/**").hasRole("USER")
                     // .requestMatchers("/admin/**").hasRole("ADMIN")
                     // .anyRequest().authenticated()
@@ -70,24 +73,24 @@ public class SecurityConfig {
                     .loginPage("/auth/login")
                     .loginProcessingUrl("/auth/login")
                     .successHandler(tokenAuthenticationSuccessHandler())
-                    .failureHandler(new TokenAuthenticationFailureHandler(objectMapper))
+                    .failureHandler(new TokenAuthenticationFailureHandler(objectMapper, frontendUrl))
             )
             .userDetailsService(customUserDetailsService)
             .oauth2Login(oauth2 -> oauth2
                     .authorizationEndpoint(authorization -> authorization
                             .baseUri("/oauth2/authorization"))
                     .redirectionEndpoint(redirection -> redirection
-                            .baseUri("/oauth/callback/*"))
+                            .baseUri("/login/oauth2/code/*"))
                     .userInfoEndpoint(userInfo ->
                             userInfo.userService(customUserDetailsService))
                     .successHandler(tokenAuthenticationSuccessHandler())
-                    .failureHandler(new TokenAuthenticationFailureHandler(objectMapper))
+                    .failureHandler(new TokenAuthenticationFailureHandler(objectMapper, frontendUrl))
 
             )
             .exceptionHandling(exceptionHandling -> exceptionHandling
                 .authenticationEntryPoint((request, response, authException) -> {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.getWriter().write("Unauthorized:" + authException.getMessage());
+                    System.out.println("Authentication Exception: " + authException.getMessage());
+                    response.sendRedirect(frontendUrl + "/auth/sign1/ssoSignup");
                 })
             )
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -103,12 +106,17 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://accounts.google.com"));
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:3000"
+                , "https://accounts.google.com"
+                , "https://oauth2.googleapis.com"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
 //        "Authorization", "Content-Type", "X-Requested-With"
         configuration.setAllowCredentials(true);
-        configuration.setExposedHeaders(Arrays.asList("Set-Cookie"));
+        configuration.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization"));
+        configuration.addAllowedHeader("*");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

@@ -9,8 +9,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -29,7 +32,8 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
     private final UserAuthService userAuthService;
     private final CookieUtil cookieUtil;
     private final AuthenticationUtil authenticationUtil;
-    private  static final String FRONTEND_URL = "http://localhost:3000";
+    @Value("${frontend.url}")
+    private String FRONTEND_URL;
 
     public TokenAuthenticationSuccessHandler(JwtService jwtService, ObjectMapper objectMapper, UserAuthService userAuthService, CookieUtil cookieUtil, AuthenticationUtil authenticationUtil){
         this.jwtService = jwtService;
@@ -75,18 +79,20 @@ public class TokenAuthenticationSuccessHandler implements AuthenticationSuccessH
         String registrationId = oauth2Token.getAuthorizedClientRegistrationId();
         String email = extractEmail(oauth2User, registrationId);
 
+        System.out.println("OAuth2 Token: " + oauth2Token);
+        System.out.println("OAuth2 User Attributes: " + oauth2User.getAttributes());
+
         Map<String, String> params = new HashMap<>();
         params.put("email", email);
         params.put("registrationId", registrationId);
 
         UserAccountVO user = userAuthService.ssoLoginSelect(params);
-
-        // 이용자 편의성 기능 나중에 하기.
-        if(user == null){
-            redirectToOAuth2Signup(email, registrationId, response);
+        if(user != null){
+            processOAuth2Login(user, email, registrationId, response);
         } else {
-            processOAuth2Login(user, email, registrationId ,response);
+            redirectToOAuth2Signup(email, registrationId, response);
         }
+
     }
 
     private void handleDefaultLogin(HttpServletResponse response, Authentication authentication) throws IOException{
